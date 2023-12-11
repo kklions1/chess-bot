@@ -89,14 +89,10 @@ void parse_fen_string(const std::string& fen, Board& board) {
                 board.black_castle_short = true; 
                 break;
             case '-': 
-                board.black_castle_long = false; 
-                board.black_castle_short = false;
-                board.white_castle_long = false;
-                board.white_castle_short = false;
+                // no one has castling rights, which is the default in my board
                 break;
         }
     }
-
 }
 
 std::string generate_fen_string(const Board& board) { 
