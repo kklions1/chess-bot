@@ -10,14 +10,18 @@ int main() {
 
     Board* game_board = new Board(); 
 
-    std::vector<std::string> split_fen = split(test_fen, ' ');
+    parse_fen_string(test_fen, *game_board);
 
+    std::cout << *(game_board->board) << std::endl;
+    std::cout << game_board->active_color << std::endl;
+    std::cout << game_board->white_castle_long << std::endl;
+    std::cout << game_board->white_castle_short << std::endl;
+    std::cout << game_board->black_castle_long << std::endl;
+    std::cout << game_board->black_castle_short << std::endl;
+    std::cout << game_board->en_passant_target << std::endl;
+    std::cout << game_board->halfmove_clock << std::endl;
+    std::cout << game_board->fullmove_clock << std::endl;
 
-    for (std::string s : split_fen) { 
-        std::cout << s << std::endl;
-    }
-
-    // parse_fen_string(test_fen, *game_board);
     // print_board(*game_board);
     // std::string generated_fen = generate_fen_string(*game_board);
 

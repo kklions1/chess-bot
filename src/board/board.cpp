@@ -6,10 +6,6 @@ void print_board(const Board& board) {
     }
 }
 
-void parse_piece_locations(const std::string& pieces, Board& board) { 
-
-}
-
 std::vector<std::string> split(std::string s, const char delim) { 
     std::vector<std::string> result; 
     std::size_t pos;
@@ -22,86 +18,75 @@ std::vector<std::string> split(std::string s, const char delim) {
     }
 
     result.push_back(s);
-    
+
     return result; 
 }
 
-void parse_fen_string(std::string fen, Board& board) { 
-    std::vector<std::string> fen_split = split(fen, ' ');
+void parse_piece_locations(const std::string& fen, Board& board) { 
+    auto it = fen.begin(); 
+    int index = 0;
 
-    parse_piece_locations(fen_split[0], board);
-
-
-}
-
-void parse_fen_string(const std::string& fen, Board& board) { 
-    int index = 0; 
-    auto current = fen.begin(); 
-
-    // parse the positions of the pieces on the board
-    while (*current != ' ') { 
-        int* current_square = &board.board[index];
-
-        if (isdigit(*current)) { 
-            index += (*current - '0'); 
+    while (it != fen.end()) { 
+        int* square = &board.board[index]; 
+        if (isdigit(*it)) { 
+            index += (*it - '0'); 
         } else { 
-            switch (*current) { 
+            switch (*it) { 
                 case 'p':
-                    *current_square = Piece::BLACK | Piece::PAWN; 
+                    *square = Piece::BLACK | Piece::PAWN; 
                     break; 
                 case 'P': 
-                    *current_square = Piece::WHITE | Piece::PAWN; 
+                    *square = Piece::WHITE | Piece::PAWN; 
                     break;
                 case 'n': 
-                    *current_square = Piece::BLACK | Piece::KNIGHT;
+                    *square = Piece::BLACK | Piece::KNIGHT;
                     break;
                 case 'N': 
-                    *current_square = Piece::WHITE | Piece::KNIGHT; 
+                    *square = Piece::WHITE | Piece::KNIGHT; 
                     break; 
                 case 'b': 
-                    *current_square = Piece::BLACK | Piece::BISHOP;
+                    *square = Piece::BLACK | Piece::BISHOP;
                     break;
                 case 'B': 
-                    *current_square = Piece::WHITE | Piece::BISHOP;
+                    *square = Piece::WHITE | Piece::BISHOP;
                     break;
                 case 'r': 
-                    *current_square = Piece::BLACK | Piece::ROOK;
+                    *square = Piece::BLACK | Piece::ROOK;
                     break;
                 case 'R': 
-                    *current_square = Piece::WHITE | Piece::ROOK;
+                    *square = Piece::WHITE | Piece::ROOK;
                     break;
                 case 'q':
-                    *current_square = Piece::BLACK | Piece::QUEEN;
+                    *square = Piece::BLACK | Piece::QUEEN;
                     break;
                 case 'Q': 
-                    *current_square = Piece::WHITE | Piece::QUEEN;
+                    *square = Piece::WHITE | Piece::QUEEN;
                     break;
                 case 'k':
-                    *current_square = Piece::BLACK | Piece::KING;
+                    *square = Piece::BLACK | Piece::KING;
                     break;
                 case 'K':
-                    *current_square = Piece::WHITE | Piece::KING;
+                    *square = Piece::WHITE | Piece::KING;
                     break;
                 case '/': 
                     // skip, should go to next rank
                     break;
             }
-            
             index++;
         }
-        current++;
+        it++;
     }
-
-    // parse the rest of the fen string 
-    current++; // skip the space
+}
     
-    board.active_color = *current; 
-    current++; // next position
+void parse_active_color(const std::string& fen, Board& board) { 
+    board.active_color = fen.c_str()[0];
+}
 
-    current++; // skip the space 
+void parse_castling_rights(const std::string& fen, Board& board) { 
+    auto it = fen.begin();
 
-    while (*current != ' ') { 
-        switch (*current) { 
+    while (it != fen.end()) { 
+        switch (*it) { 
             case 'Q': 
                 board.white_castle_long = true;
                 break;
@@ -118,53 +103,50 @@ void parse_fen_string(const std::string& fen, Board& board) {
                 // no one has castling rights, which is the default in my board
                 break;
         }
-        current++;
+
+        it++;
     }
+}
 
-    current++; // skips the space 
-
+void parse_en_passant_targets(const std::string& fen, Board& board) { 
     // Parse en-passant targets 
-    if (*current == '-') { 
+    const char* target = fen.c_str(); 
+
+    if (target[0] == '-') { 
         board.en_passant_target = -1;
-        current++; 
     } else { 
-        char space[2]; 
-        space[0] = *current;
-        current++;
-        space[1] = *current;
-        board.en_passant_target = get_board_index(space);
-        current++;
+        board.en_passant_target = get_board_index(target);
+    }
+}
+
+void parse_halfmove_clock(const std::string& fen, Board& board) { 
+    board.halfmove_clock = std::stoi(fen);
+}
+
+void parse_fullmove_clock(const std::string& fen, Board& board) { 
+    board.fullmove_clock = std::stoi(fen);
+}
+
+void parse_fen_string(std::string fen, Board& board) { 
+    std::vector<std::string> fen_split = split(fen, ' ');
+
+    if (fen_split.size() != 6) { 
+        // TODO how do C++ exceptions work exactly? what happens if this is thrown and i dont have a try/catch?
+        throw std::runtime_error("fen string appears to be invalid");
     }
 
-    current++; // skips whitespace 
+    parse_piece_locations(fen_split[0], board);
+    
+    parse_active_color(fen_split[1], board);
 
-    // parse halfmove clock
-    char* buffer = new char[3]; 
-    int i = 0;
-    while (*current != ' ') { 
-        buffer[i] = *current; 
-        current++;
-        i++;
-    }
+    parse_castling_rights(fen_split[2], board);
 
-    delete [] buffer; 
+    parse_en_passant_targets(fen_split[3], board);
 
-    board.halfmove_clock = std::stoi(buffer); 
+    parse_halfmove_clock(fen_split[4], board);
 
-    current++; 
+    parse_fullmove_clock(fen_split[5], board);
 
-    // parse fullmove clock 
-    char* buff = new char[4];
-    int j = 0; 
-    while (*current != ' ' || *current == '\0') { 
-        buff[j] = *current; 
-        current++;
-        j++;
-    }
-
-    board.fullmove_clock = std::stoi(buff); 
-
-    delete [] buff;
 }
 
 std::string generate_fen_string(const Board& board) { 
