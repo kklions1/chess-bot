@@ -10,11 +10,12 @@ int main() {
 
     Board* game_board = new Board(); 
 
+
     parse_fen_string(test_fen, *game_board);
-    print_board(*game_board);
-    std::string generated_fen = generate_fen_string(*game_board);
+    // print_board(*game_board);
+    // std::string generated_fen = generate_fen_string(*game_board);
 
     delete game_board; 
-    
+
     return 0; 
 }

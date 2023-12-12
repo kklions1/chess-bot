@@ -6,7 +6,6 @@
 #include <iostream> 
 
 void print_board(const Board& board) { 
-    
     for (int i = 0; i < 64; ++i) { 
         // TODO implement something 
     }
@@ -67,13 +66,17 @@ void parse_fen_string(const std::string& fen, Board& board) {
             
             index++;
         }
+        current++;
     }
 
     // parse the rest of the fen string 
-    current++;
+    current++; // skip the space
+    
     board.active_color = *current; 
+    current++; // next position
 
-    current++;
+    current++; // skip the space 
+
     while (*current != ' ') { 
         switch (*current) { 
             case 'Q': 
@@ -92,14 +95,114 @@ void parse_fen_string(const std::string& fen, Board& board) {
                 // no one has castling rights, which is the default in my board
                 break;
         }
+        current++;
     }
+
+    current++; // skips the space 
+
+    // Parse en-passant targets 
+    if (*current == '-') { 
+        board.en_passant_target = -1;
+        current++; 
+    } else { 
+        char space[2]; 
+        space[0] = *current;
+        current++;
+        space[1] = *current;
+        board.en_passant_target = get_board_index(space);
+        current++;
+    }
+
+    current++; // skips whitespace 
+
+    // parse halfmove clock
+    char* buffer = new char[3]; 
+    int i = 0;
+    while (*current != ' ') { 
+        buffer[i] = *current; 
+        current++;
+        i++;
+    }
+
+    board.halfmove_clock = std::stoi(buffer); 
+
+    current++; 
+
+    // parse fullmove clock 
+    i = 0; 
+    while (*current != ' ' || *current == '\0') { 
+        buffer[i] = *current; 
+        current++;
+        i++;
+    }
+
+    board.fullmove_clock = std::stoi(buffer); 
+
+    delete [] buffer;
 }
 
 std::string generate_fen_string(const Board& board) { 
     return "";
 }
 
+// accepts a position string in algebraic notation, ex: e4
+int get_board_index(const char* square) { 
+    int rank_offset = 0;
+    int file_offset = 0; 
 
-int get_board_index(const std::string& position) { 
-    return -1;
+    switch (square[0]) { 
+        case 'a': 
+            file_offset = 0;
+            break;
+        case 'b': 
+            file_offset = 1; 
+            break;
+        case 'c':
+            file_offset = 2;
+            break;
+        case 'd':
+            file_offset = 3;
+            break;
+        case 'e': 
+            file_offset = 4;
+            break;
+        case 'f': 
+            file_offset = 5;
+            break;
+        case 'g': 
+            file_offset = 6;
+            break;
+        case 'h': 
+            file_offset = 7;
+            break;
+    }
+    
+    switch(square[1]) { 
+        case '1': 
+            rank_offset = 7;
+            break;
+        case '2':
+            rank_offset = 6;
+            break;
+        case '3': 
+            rank_offset = 5;
+            break;
+        case '4': 
+            rank_offset = 4;
+            break;
+        case '5': 
+            rank_offset = 3;
+            break;
+        case '6': 
+            rank_offset = 2;
+            break;
+        case '7': 
+            rank_offset = 1;
+            break;
+        case '8': 
+            rank_offset = 0;
+            break;
+    }
+
+    return (rank_offset * 8) + file_offset;
 }
