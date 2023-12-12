@@ -1,9 +1,61 @@
 #include "board.hpp" 
 
 void print_board(const Board& board) { 
+    int counter = 0;
+    std::string result = ""; 
+
     for (int i = 0; i < 64; ++i) { 
-        // TODO implement something 
+        switch (board.board[i]) { 
+            case Piece::BLACK | Piece::PAWN: 
+                result.append("p");
+                break; 
+            case Piece::WHITE | Piece::PAWN: 
+                result.append("P");
+                break;
+            case Piece::BLACK | Piece::KNIGHT: 
+                result.append("n");
+                break;
+            case Piece::WHITE | Piece::KNIGHT: 
+                result.append("N");
+                break; 
+            case Piece::BLACK | Piece::BISHOP: 
+                result.append("b");
+                break;
+            case Piece::WHITE | Piece::BISHOP: 
+                result.append("B");
+                break;
+            case Piece::BLACK | Piece::ROOK: 
+                result.append("r");
+                break;
+            case Piece::WHITE | Piece::ROOK: 
+                result.append("R");
+                break;
+            case Piece::BLACK | Piece::QUEEN:
+                result.append("q");
+                break;
+            case Piece::WHITE | Piece::QUEEN: 
+                result.append("Q");
+                break;
+            case Piece::BLACK | Piece::KING:
+                result.append("k");
+                break;
+            case Piece::WHITE | Piece::KING:
+                result.append("K");
+                break;
+            case Piece::EMPTY: 
+                result.append("0");
+                break;
+        }
+
+        result.append(" ");
+        counter++; 
+        if (counter == 8) { 
+            result.append("\n"); 
+            counter = 0;
+        }
     }
+
+    std::cout << result << std::endl;
 }
 
 std::vector<std::string> split(std::string s, const char delim) { 
@@ -34,45 +86,56 @@ void parse_piece_locations(const std::string& fen, Board& board) {
             switch (*it) { 
                 case 'p':
                     *square = Piece::BLACK | Piece::PAWN; 
+                    index++;
                     break; 
                 case 'P': 
                     *square = Piece::WHITE | Piece::PAWN; 
+                    index++;
                     break;
                 case 'n': 
                     *square = Piece::BLACK | Piece::KNIGHT;
+                    index++;
                     break;
                 case 'N': 
                     *square = Piece::WHITE | Piece::KNIGHT; 
+                    index++;
                     break; 
                 case 'b': 
                     *square = Piece::BLACK | Piece::BISHOP;
+                    index++;
                     break;
                 case 'B': 
                     *square = Piece::WHITE | Piece::BISHOP;
+                    index++;
                     break;
                 case 'r': 
                     *square = Piece::BLACK | Piece::ROOK;
+                    index++;
                     break;
                 case 'R': 
                     *square = Piece::WHITE | Piece::ROOK;
+                    index++;
                     break;
                 case 'q':
                     *square = Piece::BLACK | Piece::QUEEN;
+                    index++;
                     break;
                 case 'Q': 
                     *square = Piece::WHITE | Piece::QUEEN;
+                    index++;
                     break;
                 case 'k':
                     *square = Piece::BLACK | Piece::KING;
+                    index++;
                     break;
                 case 'K':
                     *square = Piece::WHITE | Piece::KING;
+                    index++;
                     break;
                 case '/': 
                     // skip, should go to next rank
                     break;
             }
-            index++;
         }
         it++;
     }
@@ -153,7 +216,7 @@ std::string generate_fen_string(const Board& board) {
     return "";
 }
 
-// accepts a position string in algebraic notation, ex: e4
+// accepts a position string in algebraic notation, ex: e4, g6, h5
 int get_board_index(const char* square) { 
     int rank_offset = 0;
     int file_offset = 0; 

@@ -12,17 +12,7 @@ int main() {
 
     parse_fen_string(test_fen, *game_board);
 
-    std::cout << *(game_board->board) << std::endl;
-    std::cout << game_board->active_color << std::endl;
-    std::cout << game_board->white_castle_long << std::endl;
-    std::cout << game_board->white_castle_short << std::endl;
-    std::cout << game_board->black_castle_long << std::endl;
-    std::cout << game_board->black_castle_short << std::endl;
-    std::cout << game_board->en_passant_target << std::endl;
-    std::cout << game_board->halfmove_clock << std::endl;
-    std::cout << game_board->fullmove_clock << std::endl;
-
-    // print_board(*game_board);
+    print_board(*game_board);
     // std::string generated_fen = generate_fen_string(*game_board);
 
     delete game_board; 
