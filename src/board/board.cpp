@@ -1,14 +1,37 @@
 #include "board.hpp" 
-#include "../common/common_structs.hpp"
-
-#include <string> 
-#include <ctype.h>
-#include <iostream> 
 
 void print_board(const Board& board) { 
     for (int i = 0; i < 64; ++i) { 
         // TODO implement something 
     }
+}
+
+void parse_piece_locations(const std::string& pieces, Board& board) { 
+
+}
+
+std::vector<std::string> split(std::string s, const char delim) { 
+    std::vector<std::string> result; 
+    std::size_t pos;
+    std::string token; 
+
+    while ((pos = s.find(delim)) != std::string::npos) { 
+        token = s.substr(0, pos); 
+        result.push_back(token);
+        s.erase(0, pos + 1); 
+    }
+
+    result.push_back(s);
+    
+    return result; 
+}
+
+void parse_fen_string(std::string fen, Board& board) { 
+    std::vector<std::string> fen_split = split(fen, ' ');
+
+    parse_piece_locations(fen_split[0], board);
+
+
 }
 
 void parse_fen_string(const std::string& fen, Board& board) { 
@@ -124,21 +147,24 @@ void parse_fen_string(const std::string& fen, Board& board) {
         i++;
     }
 
+    delete [] buffer; 
+
     board.halfmove_clock = std::stoi(buffer); 
 
     current++; 
 
     // parse fullmove clock 
-    i = 0; 
+    char* buff = new char[4];
+    int j = 0; 
     while (*current != ' ' || *current == '\0') { 
-        buffer[i] = *current; 
+        buff[j] = *current; 
         current++;
-        i++;
+        j++;
     }
 
-    board.fullmove_clock = std::stoi(buffer); 
+    board.fullmove_clock = std::stoi(buff); 
 
-    delete [] buffer;
+    delete [] buff;
 }
 
 std::string generate_fen_string(const Board& board) { 

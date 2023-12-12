@@ -10,8 +10,14 @@ int main() {
 
     Board* game_board = new Board(); 
 
+    std::vector<std::string> split_fen = split(test_fen, ' ');
 
-    parse_fen_string(test_fen, *game_board);
+
+    for (std::string s : split_fen) { 
+        std::cout << s << std::endl;
+    }
+
+    // parse_fen_string(test_fen, *game_board);
     // print_board(*game_board);
     // std::string generated_fen = generate_fen_string(*game_board);
 
