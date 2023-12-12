@@ -1,7 +1,2 @@
-CMakeFiles/
-chess
-cmake_install.cmake
-CMakeCache.txt
 .vscode/ 
-Makefile
 build/

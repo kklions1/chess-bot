@@ -36,8 +36,8 @@ typedef struct Board {
 
     Board() :
         board { Piece::EMPTY },
-        white_castle_long(false), white_castle_short(false),
-        black_castle_long(false), black_castle_short(false), 
+        white_castle_short(false), white_castle_long(false),
+        black_castle_short(false), black_castle_long(false), 
         en_passant_target(-1), halfmove_clock(0), fullmove_clock(0),
         active_color(-1) {}
 } Board; 
