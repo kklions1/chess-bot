@@ -213,7 +213,28 @@ void parse_fen_string(std::string fen, Board& board) {
 }
 
 std::string generate_fen_string(const Board& board) { 
-    return "";
+    std::string fen; 
+    // The counter for where to place '/' in the fen string. when this is 8, we need a new line 
+    int rank_count = 0;
+    
+    // The counter for when we encounter empty spaces. Every empty space adds 1 to the counter, when a non-empty square is reached
+    // I need to append this count to the fen string only if it is greater than 0. If we do append it, it should be reset back to 0
+    int skip_count = 0;
+
+    for (int i = 0; i < 64; i++) { 
+
+        if (board.board[i] == Piece::EMPTY) { 
+             skip_count++;
+             continue; 
+        } 
+
+        // switch (board.board[i]) { 
+        //     case Piece::BLACK | Piece::PAWN: 
+              
+        // }
+    }
+
+    return fen;
 }
 
 // accepts a position string in algebraic notation, ex: e4, g6, h5

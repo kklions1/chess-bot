@@ -1,12 +1,5 @@
 #pragma once 
 
-#include <string> 
-
-typedef struct Position { 
-    std::string fenStr; 
-    float evaluation; 
-} Position;
-
 typedef enum Piece { 
     EMPTY = 0, 
     PAWN = 1, 

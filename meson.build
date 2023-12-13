@@ -4,5 +4,11 @@ project(
     default_options: ['cpp_std=c++20'] 
 )
 
-source = ['src/main.cpp', 'src/board/board.cpp']
+source = [
+    'src/main.cpp',
+    'src/board/board.cpp'
+]
+
+# sfml = dependency('sfml')
+
 executable('chess', source)
