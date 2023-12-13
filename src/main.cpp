@@ -20,7 +20,53 @@ int main() {
     // parse_fen_string(starting_fen, *starting_position);
     // print_board(*starting_position);
 
-    draw_main_window();
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Chess");
+
+    float current_x = 0.0f;
+    float current_y = 0.0f;
+    std::vector<sf::RectangleShape> squares; 
+    bool alternator = false;
+
+    for (int i = 0; i < 64; i++) { 
+        if (alternator) { 
+            std::cout << "coordiantes: x = " << current_x << " y = " << current_y << std::endl;
+            squares.push_back(dark_square(current_x, current_y));
+        } else { 
+            squares.push_back(light_square(current_x, current_y));
+        }
+
+        if (i % 8 == 0 && i != 0) { 
+            current_x = 0.0f;
+            current_y += 100.0f;    
+        } else { 
+            current_x += 100.0f;
+        }
+
+        alternator = !alternator;
+    }
+
+    while (window.isOpen()) { 
+        sf::Event event;
+        while (window.pollEvent(event)) { 
+            if (event.type == sf::Event::Closed) { 
+                window.close();
+            }
+
+        }
+
+        window.clear(sf::Color::Green);
+
+        for (sf::RectangleShape r : squares) { 
+            window.draw(r);
+        }
+
+        // sf::RectangleShape red(sf::Vector2f(100.0f, 100.0f));
+        // red.setFillColor(sf::Color::Red);
+        // red.setPosition(sf::Vector2f(0.0f, 100.0f));
+        // window.draw(red);
+
+        window.display();
+    }
 
     return 0; 
 }

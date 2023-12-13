@@ -1,11 +1,11 @@
 #pragma once 
 
-#include "../common/common_structs.hpp" 
-
 #include <string> 
 #include <ctype.h>
 #include <iostream> 
 #include <vector>
+
+#include "../common/common_structs.hpp" 
 
 void print_board(const Board&); 
 void parse_fen_string(std::string, Board&); 

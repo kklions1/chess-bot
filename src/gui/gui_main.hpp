@@ -1,5 +1,7 @@
 #pragma once 
 
 #include <SFML/Window.hpp> 
+#include <SFML/Graphics.hpp>
 
-void draw_main_window(); 
+sf::RectangleShape light_square(float, float);
+sf::RectangleShape dark_square(float, float);

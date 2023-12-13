@@ -1,14 +1,17 @@
 #include "gui_main.hpp"
 
-void draw_main_window() {
-    sf::Window window(sf::VideoMode(800, 600), "Chess");
-    
-    while (window.isOpen()) { 
-        sf::Event event;
-        while (window.pollEvent(event)) { 
-            if (event.type == sf::Event::Closed) { 
-                window.close();
-            }
-        }
-    }
+sf::RectangleShape light_square(float x, float y) { 
+    sf::RectangleShape square(sf::Vector2f(100.0f, 100.0f));
+    square.setFillColor(sf::Color::White);
+    square.setPosition(sf::Vector2f(x, y));
+
+    return square;
+}
+
+sf::RectangleShape dark_square(float x, float y) { 
+    sf::RectangleShape square(sf::Vector2f(100.0f, 100.0f));
+    square.setFillColor(sf::Color::Black);
+    square.setPosition(sf::Vector2f(x, y));
+
+    return square;
 }
