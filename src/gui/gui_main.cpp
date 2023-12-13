@@ -9,7 +9,6 @@ void draw_main_window() {
             if (event.type == sf::Event::Closed) { 
                 window.close();
             }
-            
         }
     }
 }
