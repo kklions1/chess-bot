@@ -15,7 +15,7 @@ sf::RectangleShape light_square(float x, float y) {
 
 sf::RectangleShape dark_square(float x, float y) { 
     sf::RectangleShape square(sf::Vector2f(100.0f, 100.0f));
-    square.setFillColor(sf::Color(0, 4, 71));
+    square.setFillColor(sf::Color(0, 4, 100));
     square.setPosition(sf::Vector2f(x, y));
     
     // std::cout << "dark square at (" << x << ", " << y << ")\n";
@@ -29,8 +29,8 @@ std::vector<sf::RectangleShape> generate_squares() {
     bool color_alternator = true;
     std::vector<sf::RectangleShape> squares; 
 
-    for (int rank = 0; rank < 8; rank++) { 
-        for (int file = 0; file < 8; file++) { 
+    for (int file = 0; file < 8; file++) { 
+        for (int rank = 0; rank < 8; rank++) { 
             if (color_alternator) { 
                 squares.push_back(light_square(rank * 100, file * 100));
             } else { 
