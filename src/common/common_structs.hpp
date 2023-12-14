@@ -35,3 +35,4 @@ typedef struct Board {
         active_color(-1) {}
 } Board; 
 
+
