@@ -1,5 +1,4 @@
 #include "gui_main.hpp"
-#include "piece_sprite.hpp"
 
 #include <iostream>
 
@@ -23,7 +22,7 @@ sf::RectangleShape dark_square(float x, float y) {
     return square;
 }
 
-std::vector<sf::RectangleShape> generate_squares() { 
+std::vector<sf::RectangleShape> init_squares() { 
     float current_x = 0.0f;
     float current_y = 0.0f;
     bool color_alternator = true;

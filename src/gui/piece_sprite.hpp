@@ -1,12 +1,13 @@
 #pragma once 
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 #include "../common/common_structs.hpp"
 
 typedef struct PieceSprite { 
-    std::shared_ptr<sf::Texture> piece_texture;
-    sf::RectangleShape sprite;
-} Square; 
+    std::shared_ptr<sf::Texture> texture;
+    sf::RectangleShape shape;
+} PieceSprite; 
 
-std::unique_ptr<PieceSprite> create_square(std::shared_ptr<sf::Texture>);
+// PieceSprite create_sprite(std::shared_ptr<sf::Texture>);
