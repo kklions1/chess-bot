@@ -7,17 +7,6 @@
 #include "board/board.hpp"
 #include "gui/gui_main.hpp"
 
-PieceSprite create_spite(std::shared_ptr<sf::Texture> texture) { 
-    auto sprite = PieceSprite(); 
-    sprite.texture = texture;
-    sprite.shape = sf::RectangleShape(sf::Vector2f(100.0f, 100.0f));
-    sprite.shape.setTexture(sprite.texture.get());
-    sprite.shape.setFillColor(sf::Color(255, 255, 255, 0));
-    sprite.shape.setScale(sf::Vector2f(0.75f, 0.75f));
-    
-    return sprite;
-}
-
 int main() { 
     std::string test_fen = "rn1q1rk1/pp2ppbp/3p1np1/2p2b2/3P1B2/1QP1PN2/PP1NBPPP/R3K2R b KQ - 1 8"; 
     std::string starting_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -40,8 +29,8 @@ int main() {
         int piece = game_board->board[i];
         if (piece != Piece::EMPTY) { 
             PieceSprite sprite = create_sprite(texture_map[piece]);
-            // sprite.shape.setPosition(squares[i].getPosition());
-            // pieces.push_back(sprite);
+            sprite.shape.setPosition(squares[i].getPosition());
+            pieces.push_back(sprite);
         }
     }
 
