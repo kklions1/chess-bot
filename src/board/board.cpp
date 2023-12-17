@@ -236,7 +236,7 @@ std::string generate_fen_string(const Board& board) {
         
         switch (board.board[i]) { 
             case Piece::BLACK | Piece::PAWN: 
-
+                break;
                 
         }
 
