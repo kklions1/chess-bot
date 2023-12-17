@@ -1,5 +1,7 @@
 #pragma once 
 
+#include <SFML/Graphics.hpp>
+
 typedef enum Piece { 
     EMPTY = 0, 
     PAWN = 1, 
@@ -35,4 +37,8 @@ typedef struct Board {
         active_color(-1) {}
 } Board; 
 
-
+typedef struct Move { 
+    int piece;
+    int starting_index;
+    int new_index;
+} Move; 

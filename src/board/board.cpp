@@ -212,6 +212,8 @@ void parse_fen_string(std::string fen, Board& board) {
 
 }
 
+
+
 std::string generate_fen_string(const Board& board) { 
     std::string fen; 
     // The counter for where to place '/' in the fen string. when this is 8, we need a new line 
@@ -222,11 +224,21 @@ std::string generate_fen_string(const Board& board) {
     int skip_count = 0;
 
     for (int i = 0; i < 64; i++) { 
+        if (board.board[0] == Piece::EMPTY) { 
+            skip_count++;
+            continue;
+        }
 
-        if (board.board[i] == Piece::EMPTY) { 
-             skip_count++;
-             continue; 
-        } 
+        if (skip_count != 0) { 
+            // fen.append();
+            skip_count = 0;
+        }
+        
+        switch (board.board[i]) { 
+            case Piece::BLACK | Piece::PAWN: 
+
+                
+        }
 
         // switch (board.board[i]) { 
         //     case Piece::BLACK | Piece::PAWN: 

@@ -11,3 +11,6 @@ typedef struct PieceSprite {
 } PieceSprite; 
 
 PieceSprite create_sprite(std::shared_ptr<sf::Texture>);
+sf::Vector2f calculate_position(int);
+int calculate_index(const sf::Vector2f&);
+// void snap_to_square(const sf::Vector2f&);

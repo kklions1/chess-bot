@@ -29,7 +29,7 @@ int main() {
         int piece = game_board->board[i];
         if (piece != Piece::EMPTY) { 
             PieceSprite sprite = create_sprite(texture_map[piece]);
-            sprite.shape.setPosition(squares[i].getPosition());
+            sprite.shape.setPosition(calculate_position(i));
             pieces.push_back(sprite);
         }
     }
