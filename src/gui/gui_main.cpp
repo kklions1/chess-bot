@@ -2,26 +2,6 @@
 
 #include <iostream>
 
-sf::RectangleShape light_square(float x, float y) { 
-    sf::RectangleShape square(sf::Vector2f(100.0f, 100.0f));
-    square.setFillColor(sf::Color(0, 138, 209));
-    square.setPosition(sf::Vector2f(x, y));
-    
-    // std::cout << "light square at (" << x << ", " << y << ")\n";
-
-    return square;
-}
-
-sf::RectangleShape dark_square(float x, float y) { 
-    sf::RectangleShape square(sf::Vector2f(100.0f, 100.0f));
-    square.setFillColor(sf::Color(0, 4, 100));
-    square.setPosition(sf::Vector2f(x, y));
-    
-    // std::cout << "dark square at (" << x << ", " << y << ")\n";
-
-    return square;
-}
-
 std::vector<sf::RectangleShape> init_squares() { 
     float current_x = 0.0f;
     float current_y = 0.0f;
@@ -31,9 +11,17 @@ std::vector<sf::RectangleShape> init_squares() {
     for (int file = 0; file < 8; file++) { 
         for (int rank = 0; rank < 8; rank++) { 
             if (color_alternator) { 
-                squares.push_back(light_square(rank * 100, file * 100));
+                sf::RectangleShape light_square(sf::Vector2f(100.0f, 100.0f));
+                light_square.setFillColor(sf::Color::White);
+                light_square.setPosition(sf::Vector2f(rank * 100, file * 100));
+
+                squares.push_back(light_square);
             } else { 
-                squares.push_back(dark_square(rank * 100, file * 100));
+                sf::RectangleShape dark_square(sf::Vector2f(100.0f, 100.0f));
+                dark_square.setFillColor(sf::Color(171, 171, 255));
+                dark_square.setPosition(sf::Vector2f(rank * 100, file * 100));
+
+                squares.push_back(dark_square);
             }
 
             color_alternator = !color_alternator;
@@ -101,4 +89,29 @@ std::unordered_map<int, std::shared_ptr<sf::Texture>> init_textures() {
     };
 
     return texture_map; 
+}
+
+PieceSprite* get_piece_at_position(const sf::Vector2i& click_pos, std::vector<PieceSprite>& sprites) {
+    for (int i = 0; i < sprites.size(); ++i) { 
+        debug_print_vector(sf::Vector2i(click_pos.x / 100, click_pos.y / 100));
+        if (sprites[i].shape.getPosition() == sf::Vector2f(normalize_to_corner(click_pos))) { 
+            std::cout << "found a piece!\n";
+            return &sprites[i]; 
+        }
+    }
+
+    std::cout << "No dice\n";
+    return nullptr;
+}
+
+void handle_mouse_pressed() { 
+
+}
+
+sf::Vector2i normalize_to_corner(const sf::Vector2i& pos) { 
+    return sf::Vector2i(((pos.x / 100) * 100), ((pos.y / 100) * 100));
+}
+
+void debug_print_vector(const sf::Vector2i& vec) { 
+    std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }

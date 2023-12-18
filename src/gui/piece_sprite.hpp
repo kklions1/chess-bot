@@ -8,6 +8,7 @@
 typedef struct PieceSprite { 
     std::shared_ptr<sf::Texture> texture;
     sf::RectangleShape shape;
+    int piece;
 } PieceSprite; 
 
 PieceSprite create_sprite(std::shared_ptr<sf::Texture>);

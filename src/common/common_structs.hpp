@@ -1,7 +1,5 @@
 #pragma once 
 
-#include <SFML/Graphics.hpp>
-
 typedef enum Piece { 
     EMPTY = 0, 
     PAWN = 1, 

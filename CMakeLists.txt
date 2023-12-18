@@ -10,6 +10,7 @@ add_executable(chess
     src/board/board.cpp
     src/gui/gui_main.cpp
     src/gui/piece_sprite.cpp
+    src/common/app_state.cpp
 )
 
 # i have no idea how CMake finds these
