@@ -42,12 +42,12 @@ int main() {
                     break;
                 case sf::Event::MouseButtonPressed:
                     std::cout << "Button pressed: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    // sf::Vector2i init_pos(event.mouseButton.x, event.mouseButton.y);
                     current_drag = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces); 
                     is_dragging = true;
                     break;
                 case sf::Event::MouseButtonReleased:  
                     std::cout << "Button released: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
+                    snap_piece_to_square(sf::Vector2f(sf::Mouse::getPosition(window)), current_drag);
                     is_dragging = false;
                     current_drag = nullptr;
                     break;
@@ -59,7 +59,10 @@ int main() {
         window.clear(sf::Color::Green); // If green is showing, its probably because of some rendering problem
 
         if (is_dragging && current_drag != nullptr) { 
-            current_drag->shape.setPosition(sf::Vector2f(sf::Mouse::getPosition(window)));
+            sf::Vector2f mouse_pos(sf::Mouse::getPosition(window));
+            mouse_pos.x -= 50.0f;
+            mouse_pos.y -= 50.0f;
+            current_drag->shape.setPosition(mouse_pos);
         }
 
         for (auto s : squares) { 
