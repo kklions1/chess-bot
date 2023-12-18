@@ -93,9 +93,7 @@ std::unordered_map<int, std::shared_ptr<sf::Texture>> init_textures() {
 
 PieceSprite* get_piece_at_position(const sf::Vector2i& click_pos, std::vector<PieceSprite>& sprites) {
     for (int i = 0; i < sprites.size(); ++i) { 
-        debug_print_vector(sf::Vector2i(click_pos.x / 100, click_pos.y / 100));
-        if (sprites[i].shape.getPosition() == sf::Vector2f(normalize_to_corner(click_pos))) { 
-            std::cout << "found a piece!\n";
+        if (sprites[i].shape.getGlobalBounds().contains(sf::Vector2f(click_pos))) { 
             return &sprites[i]; 
         }
     }

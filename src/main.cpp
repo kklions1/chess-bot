@@ -32,13 +32,7 @@ int main() {
             pieces.push_back(sprite);
         }
     }
-
-    /* TODO click and drag logic
-        1. get position of the PieceSprite clicked
-        2. get a reference to the sprite 
-
-    */  
-
+    
     while (window.isOpen()) { 
         sf::Event event;
         while (window.pollEvent(event)) { 
