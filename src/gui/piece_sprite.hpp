@@ -3,6 +3,7 @@
 #include "../common/common_structs.hpp"
 #include "gui_main.hpp"
 
+typedef std::unordered_map<int, std::shared_ptr<sf::Texture>> TextureMap; 
 
 typedef struct PieceSprite { 
     std::shared_ptr<sf::Texture> texture;

@@ -7,6 +7,7 @@
 #include "common/common_structs.hpp"
 #include "board/board.hpp"
 #include "gui/gui_main.hpp"
+#include "board/engine.hpp"
 
 int main() { 
     // std::string test_fen = "rn1q1rk1/pp2ppbp/3p1np1/2p2b2/3P1B2/1QP1PN2/PP1NBPPP/R3K2R b KQ - 1 8"; 
@@ -21,6 +22,8 @@ int main() {
     auto pieces = init_sprites(*game_board, texture_map); 
     PieceSprite* drag_target; 
     bool is_dragging = false;
+
+    generate_legal_moves(*game_board);
     
     while (main_window.isOpen()) { 
         sf::Event event;

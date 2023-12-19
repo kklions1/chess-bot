@@ -142,7 +142,16 @@ void parse_piece_locations(const std::string& fen, Board& board) {
 }
     
 void parse_active_color(const std::string& fen, Board& board) { 
-    board.active_color = fen.c_str()[0];
+    char active_color = fen.c_str()[0];
+    if (active_color == 'w') {
+        board.active_color = Piece::WHITE;
+        return;
+    } 
+
+    if (active_color == 'b') { 
+        board.active_color = Piece::BLACK;
+        return;
+    }
 }
 
 void parse_castling_rights(const std::string& fen, Board& board) { 
@@ -309,4 +318,12 @@ int get_board_index(const char* square) {
     }
 
     return (rank_offset * 8) + file_offset;
+}
+
+bool is_color(int piece, int color_mask) { 
+    return (piece & color_mask) == color_mask;
+}
+
+int piece_type(int piece) { 
+    return piece & 0b00111;
 }

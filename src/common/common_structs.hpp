@@ -1,12 +1,5 @@
 #pragma once 
 
-#include <vector>
-#include <SFML/Graphics.hpp>
-#include <unordered_map>
-#include <memory>
-
-typedef std::unordered_map<int, std::shared_ptr<sf::Texture>> TextureMap; 
-
 typedef enum Piece { 
     EMPTY = 0, 
     PAWN = 1, 
@@ -32,7 +25,7 @@ typedef struct Board {
     int halfmove_clock; 
     int fullmove_clock; 
 
-    char active_color; 
+    int active_color; 
 
     Board() :
         board { Piece::EMPTY },
