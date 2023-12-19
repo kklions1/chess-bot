@@ -7,6 +7,7 @@
 #include "../common/common_structs.hpp"
 #include "piece_sprite.hpp" 
 
+void gui_main(const Board&);
 void handle_event_loop(const sf::Window&);
 std::vector<sf::RectangleShape> init_squares();
 std::unordered_map<int, std::shared_ptr<sf::Texture>> init_textures(); 
