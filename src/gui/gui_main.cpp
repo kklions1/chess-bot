@@ -103,7 +103,8 @@ PieceSprite* get_piece_at_position(const sf::Vector2i& click_pos, std::vector<Pi
 }
 
 sf::Vector2f normalize_to_corner(const sf::Vector2f& pos) { 
-    return sf::Vector2f(((pos.x / 100) * 100), ((pos.y / 100) * 100));
+    debug_print_vector(sf::Vector2f((((int) pos.x / 100) * 100), ((int) (pos.y / 100) * 100)));
+    return sf::Vector2f((((int) pos.x / 100) * 100), ((int) (pos.y / 100) * 100 ));
 }
 
 void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite* sprite) { 
@@ -112,6 +113,6 @@ void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite* sprite) {
     }
 }
 
-void debug_print_vector(const sf::Vector2i& vec) { 
+void debug_print_vector(const sf::Vector2f& vec) { 
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }
