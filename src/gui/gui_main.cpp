@@ -1,10 +1,8 @@
 #include "gui_main.hpp"
 
-#include <iostream>
+extern sf::RenderWindow main_window = sf::RenderWindow(sf::VideoMode(800, 800), "Chess");
 
 void gui_main(const Board& game_board) { 
-    sf::RenderWindow window(sf::VideoMode(800, 800), "Chess");
-
     // Might put these into some kind of state object for the UI.
     auto texture_map = init_textures();
     auto squares = init_squares();
@@ -22,12 +20,12 @@ void gui_main(const Board& game_board) {
         }
     }
     
-    while (window.isOpen()) { 
+    while (main_window.isOpen()) { 
         sf::Event event;
-        while (window.pollEvent(event)) { 
+        while (main_window.pollEvent(event)) { 
             switch (event.type) { 
                 case sf::Event::Closed:
-                    window.close();
+                    main_window.close();
                     break;
                 case sf::Event::MouseButtonPressed:
                     // std::cout << "Button pressed: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
@@ -36,7 +34,7 @@ void gui_main(const Board& game_board) {
                     break;
                 case sf::Event::MouseButtonReleased:  
                     // std::cout << "Button released: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    snap_piece_to_square(sf::Vector2f(sf::Mouse::getPosition(window)), current_drag);
+                    snap_piece_to_square(sf::Vector2f(sf::Mouse::getPosition(main_window)), current_drag);
                     is_dragging = false;
                     current_drag = nullptr;
                     break;
@@ -45,24 +43,24 @@ void gui_main(const Board& game_board) {
             }
         }
 
-        window.clear(sf::Color::Green); // If green is showing, its probably because of some rendering problem
+        main_window.clear(sf::Color::Green); // If green is showing, its probably because of some rendering problem
 
         if (is_dragging && current_drag != nullptr) { 
-            sf::Vector2f mouse_pos(sf::Mouse::getPosition(window));
+            sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
             mouse_pos.x -= 50.0f;
             mouse_pos.y -= 50.0f;
             current_drag->shape.setPosition(mouse_pos);
         }
 
         for (auto s : squares) { 
-            window.draw(s);
+            main_window.draw(s);
         }
 
         for (auto p : pieces) { 
-            window.draw(p.shape);
+            main_window.draw(p.shape);
         }
 
-        window.display();
+        main_window.display();
     }
 }
 

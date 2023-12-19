@@ -3,9 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <unordered_map> 
+#include <memory>
+#include <iostream>
 
 #include "../common/common_structs.hpp"
 #include "piece_sprite.hpp" 
+
+extern sf::RenderWindow main_window; 
 
 void gui_main(const Board&);
 void handle_event_loop(const sf::Window&);

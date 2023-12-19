@@ -1,6 +1,7 @@
 #include <iostream> 
 #include <memory>
 #include <string> 
+#include <thread> 
 
 #include "gui/piece_sprite.hpp"
 #include "common/common_structs.hpp"
@@ -14,7 +15,12 @@ int main() {
     auto game_board = std::make_unique<Board>();
     parse_fen_string(starting_fen, *game_board);
 
-    gui_main(*game_board);
+    std::thread ui_thread(gui_main, *game_board);
+    
+    ui_thread.join();
 
+    while (true) { 
+        std::cout << ":)"; 
+    }
     return 0; 
 }
