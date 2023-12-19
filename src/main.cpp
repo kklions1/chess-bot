@@ -23,7 +23,7 @@ int main() {
     PieceSprite* drag_target; 
     bool is_dragging = false;
 
-    generate_legal_moves(*game_board);
+    // generate_legal_moves(*game_board);
     
     while (main_window.isOpen()) { 
         sf::Event event;

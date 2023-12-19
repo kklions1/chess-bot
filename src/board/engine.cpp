@@ -9,7 +9,7 @@ std::vector<Move> generate_legal_moves(const Board& board) {
         if (is_color(piece, board.active_color)) { 
             switch (piece_type(piece)) { 
                 case Piece::PAWN:  
-                    generate_pawn_moves(i);
+                    // generate_pawn_moves(i);
                     break;
                 case Piece::KNIGHT: 
                     break;
@@ -28,6 +28,6 @@ std::vector<Move> generate_legal_moves(const Board& board) {
     return legal_moves;
 }
 
-void generate_pawn_moves(int index) { 
-    
-}
+// void generate_pawn_moves(int index) { 
+
+// }

@@ -74,7 +74,7 @@ TextureMap init_textures() {
     if (!white_king->loadFromFile("../assets/white-king.png")) throw std::runtime_error("file not found: white-king.png");
 
     TextureMap texture_map = {
-        { Piece::BLACK | Piece::PAWN, black_pawn },
+        { Piece::BLACK | Piece::PAWN, black_pawn }, 
         { Piece::BLACK | Piece::ROOK, black_rook },
         { Piece::BLACK | Piece::KNIGHT, black_horse },
         { Piece::BLACK | Piece::BISHOP, black_bishop },
