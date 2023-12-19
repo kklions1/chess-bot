@@ -2,68 +2,6 @@
 
 extern sf::RenderWindow main_window = sf::RenderWindow(sf::VideoMode(800, 800), "Chess");
 
-void gui_main(const Board& game_board) { 
-    // Might put these into some kind of state object for the UI.
-    auto texture_map = init_textures();
-    auto squares = init_squares();
-    std::vector<PieceSprite> pieces; 
-    PieceSprite* current_drag; 
-    bool is_dragging = false;
-
-    for (int i = 0; i < 64; ++i) { 
-        int piece = game_board.board[i];
-        if (piece != Piece::EMPTY) { 
-            PieceSprite sprite = create_sprite(texture_map[piece]);
-            sprite.shape.setPosition(calculate_position(i));
-            sprite.piece = piece;
-            pieces.push_back(sprite);
-        }
-    }
-    
-    while (main_window.isOpen()) { 
-        sf::Event event;
-        while (main_window.pollEvent(event)) { 
-            switch (event.type) { 
-                case sf::Event::Closed:
-                    main_window.close();
-                    break;
-                case sf::Event::MouseButtonPressed:
-                    // std::cout << "Button pressed: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    current_drag = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces); 
-                    is_dragging = true;
-                    break;
-                case sf::Event::MouseButtonReleased:  
-                    // std::cout << "Button released: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    snap_piece_to_square(sf::Vector2f(sf::Mouse::getPosition(main_window)), current_drag);
-                    is_dragging = false;
-                    current_drag = nullptr;
-                    break;
-                default: 
-                    break;
-            }
-        }
-
-        main_window.clear(sf::Color::Green); // If green is showing, its probably because of some rendering problem
-
-        if (is_dragging && current_drag != nullptr) { 
-            sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
-            mouse_pos.x -= 50.0f;
-            mouse_pos.y -= 50.0f;
-            current_drag->shape.setPosition(mouse_pos);
-        }
-
-        for (auto s : squares) { 
-            main_window.draw(s);
-        }
-
-        for (auto p : pieces) { 
-            main_window.draw(p.shape);
-        }
-
-        main_window.display();
-    }
-}
-
 std::vector<sf::RectangleShape> init_squares() { 
     float current_x = 0.0f;
     float current_y = 0.0f;
@@ -94,7 +32,7 @@ std::vector<sf::RectangleShape> init_squares() {
     return squares;
 }
 
-std::unordered_map<int, std::shared_ptr<sf::Texture>> init_textures() { 
+TextureMap init_textures() { 
     auto black_pawn = std::make_shared<sf::Texture>();
     auto black_rook = std::make_shared<sf::Texture>();
     auto black_horse = std::make_shared<sf::Texture>();
@@ -135,7 +73,7 @@ std::unordered_map<int, std::shared_ptr<sf::Texture>> init_textures() {
     
     if (!white_king->loadFromFile("../assets/white-king.png")) throw std::runtime_error("file not found: white-king.png");
 
-    std::unordered_map<int, std::shared_ptr<sf::Texture>> texture_map = {
+    TextureMap texture_map = {
         { Piece::BLACK | Piece::PAWN, black_pawn },
         { Piece::BLACK | Piece::ROOK, black_rook },
         { Piece::BLACK | Piece::KNIGHT, black_horse },
@@ -153,28 +91,29 @@ std::unordered_map<int, std::shared_ptr<sf::Texture>> init_textures() {
     return texture_map; 
 }
 
-PieceSprite* get_piece_at_position(const sf::Vector2i& click_pos, std::vector<PieceSprite>& sprites) {
-    for (int i = 0; i < sprites.size(); ++i) { 
-        if (sprites[i].shape.getGlobalBounds().contains(sf::Vector2f(click_pos))) { 
-            return &sprites[i]; 
+std::vector<PieceSprite> init_sprites(const Board& board, const TextureMap& texture_map) {
+    std::vector<PieceSprite> result;
+    for (int i = 0; i < 64; ++i) { 
+        int piece = board.board[i];
+        if (piece != Piece::EMPTY) { 
+            PieceSprite sprite = create_sprite(texture_map.at(piece));
+            sprite.shape.setPosition(calculate_position(i));
+            sprite.piece = piece;
+            result.push_back(sprite);
         }
     }
 
-    std::cout << "No dice\n";
-    return nullptr;
+    return result;
 }
 
 sf::Vector2f normalize_to_corner(const sf::Vector2f& pos) { 
-    debug_print_vector(sf::Vector2f((((int) pos.x / 100) * 100), ((int) (pos.y / 100) * 100)));
-    return sf::Vector2f((((int) pos.x / 100) * 100), ((int) (pos.y / 100) * 100 ));
-}
-
-void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite* sprite) { 
-    if (sprite != nullptr) { 
-        sprite->shape.setPosition(sf::Vector2f(normalize_to_corner(mouse_pos)));
-    }
+    return sf::Vector2f((((int) pos.x / 100) * 100), ((int) (pos.y / 100) * 100));
 }
 
 void debug_print_vector(const sf::Vector2f& vec) { 
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
+}
+
+void gui_main(const Board& board) { 
+
 }

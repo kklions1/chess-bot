@@ -2,8 +2,10 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <vector>
 
 #include "../common/common_structs.hpp"
+#include "gui_main.hpp"
 
 typedef struct PieceSprite { 
     std::shared_ptr<sf::Texture> texture;
@@ -14,4 +16,5 @@ typedef struct PieceSprite {
 PieceSprite create_sprite(std::shared_ptr<sf::Texture>);
 sf::Vector2f calculate_position(int);
 int calculate_index(const sf::Vector2f&);
-// void snap_to_square(const sf::Vector2f&);
+PieceSprite* get_piece_at_position(const sf::Vector2i&, std::vector<PieceSprite>&);
+void snap_piece_to_square(const sf::Vector2f&, PieceSprite*);
