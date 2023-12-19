@@ -9,6 +9,21 @@ PieceSprite create_sprite(std::shared_ptr<sf::Texture> texture) {
     return sprite;
 }
 
+std::vector<PieceSprite> init_sprites(const Board& board, const TextureMap& texture_map) {
+    std::vector<PieceSprite> result;
+    for (int i = 0; i < 64; ++i) { 
+        int piece = board.board[i];
+        if (piece != Piece::EMPTY) { 
+            PieceSprite sprite = create_sprite(texture_map.at(piece));
+            sprite.shape.setPosition(calculate_position(i));
+            sprite.piece = piece;
+            result.push_back(sprite);
+        }
+    }
+
+    return result;
+}
+
 sf::Vector2f calculate_position(int index) { 
     int file = index / 8;
     int rank = index % 8; 

@@ -1,5 +1,12 @@
 #pragma once 
 
+#include <vector>
+#include <SFML/Graphics.hpp>
+#include <unordered_map>
+#include <memory>
+
+typedef std::unordered_map<int, std::shared_ptr<sf::Texture>> TextureMap; 
+
 typedef enum Piece { 
     EMPTY = 0, 
     PAWN = 1, 

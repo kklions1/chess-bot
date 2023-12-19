@@ -91,21 +91,6 @@ TextureMap init_textures() {
     return texture_map; 
 }
 
-std::vector<PieceSprite> init_sprites(const Board& board, const TextureMap& texture_map) {
-    std::vector<PieceSprite> result;
-    for (int i = 0; i < 64; ++i) { 
-        int piece = board.board[i];
-        if (piece != Piece::EMPTY) { 
-            PieceSprite sprite = create_sprite(texture_map.at(piece));
-            sprite.shape.setPosition(calculate_position(i));
-            sprite.piece = piece;
-            result.push_back(sprite);
-        }
-    }
-
-    return result;
-}
-
 sf::Vector2f normalize_to_corner(const sf::Vector2f& pos) { 
     return sf::Vector2f((((int) pos.x / 100) * 100), ((int) (pos.y / 100) * 100));
 }
