@@ -3,20 +3,20 @@
 #include <iostream> 
 
 std::vector<Move> generate_legal_moves(const Board& board) { 
-    std::vector<Move> legal_moves; 
-    for (int i = 0; i < 64; i++) { 
-        int piece = board.board[i]; 
+    std::vector<Move> legal_moves;
+    for (int i = 0; i < 64; i++) {
+        int piece = board.board[i];
         if (is_color(piece, board.active_color)) { 
             switch (piece_type(piece)) { 
                 case Piece::PAWN:  
-                    // generate_pawn_moves(i);
+                    generate_pawn_moves(i, legal_moves);
                     break;
                 case Piece::KNIGHT: 
                     break;
                 case Piece::BISHOP: 
                     break;
                 case Piece::ROOK: 
-                    break;
+                    break; 
                 case Piece::QUEEN: 
                     break;
                 case Piece::KING: 
@@ -28,6 +28,6 @@ std::vector<Move> generate_legal_moves(const Board& board) {
     return legal_moves;
 }
 
-// void generate_pawn_moves(int index) { 
-
-// }
+void generate_pawn_moves(int index, std::vector<Move>& moves) { 
+  
+}

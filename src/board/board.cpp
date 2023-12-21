@@ -324,6 +324,17 @@ bool is_color(int piece, int color_mask) {
     return (piece & color_mask) == color_mask;
 }
 
-int piece_type(int piece) { 
+int piece_type(int piece) {
     return piece & 0b00111;
+}
+
+void print_index() {
+  int counter = 0; 
+  for (int i = 0; i < 64; ++i) {
+    if (counter == 8) {
+      std::cout << std::endl;
+      counter = 0;
+    }
+    std::cout << i << " ";
+  }
 }

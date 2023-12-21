@@ -14,3 +14,4 @@ int get_board_index(const char*);
 std::vector<std::string> split(std::string, const char);
 bool is_color(int, int);
 int piece_type(int);
+void print_index(); 
