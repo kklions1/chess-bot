@@ -336,5 +336,6 @@ void print_index() {
       counter = 0;
     }
     std::cout << i << " ";
+    counter++;
   }
 }

@@ -9,8 +9,8 @@ typedef enum Piece {
     QUEEN = 5, 
     KING = 6, 
 
-    WHITE = 8, 
-    BLACK = 16
+    WHITE = 8,
+    BLACK = 16 
 } Piece; 
 
 typedef struct Board { 

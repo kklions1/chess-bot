@@ -2,6 +2,7 @@
 
 sf::RenderWindow main_window = sf::RenderWindow(sf::VideoMode(800, 800), "Chess");
 
+
 std::vector<sf::RectangleShape> init_squares() {
     float current_x = 0.0f;
     float current_y = 0.0f;

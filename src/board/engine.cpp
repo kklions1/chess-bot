@@ -14,6 +14,7 @@ std::vector<Move> generate_legal_moves(const Board& board) {
                 case Piece::KNIGHT: 
                     break;
                 case Piece::BISHOP: 
+                    generate_bishop_moves(i, legal_moves);
                     break;
                 case Piece::ROOK: 
                     break; 
@@ -30,4 +31,24 @@ std::vector<Move> generate_legal_moves(const Board& board) {
 
 void generate_pawn_moves(int index, std::vector<Move>& moves) { 
   
+}
+
+void generate_bishop_moves(int index, std::vector<Move>& moves) { 
+
+}
+
+void generate_horse_moves(int index, std::vector<Move>& moves) { 
+    
+}
+
+void generate_rook_moves(int index, std::vector<Move>& moves) { 
+    
+}
+
+void generate_queen_moves(int index, std::vector<Move>& moves) { 
+    
+}
+
+void generate_king_moves(int index, std::vector<Move>& moves) { 
+    
 }
