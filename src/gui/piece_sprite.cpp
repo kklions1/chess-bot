@@ -1,12 +1,11 @@
 #include "piece_sprite.hpp"
 
-PieceSprite create_sprite(std::shared_ptr<sf::Texture> texture) { 
-    auto sprite = PieceSprite(); 
-    sprite.texture = texture;
-    sprite.shape = sf::RectangleShape(sf::Vector2f(100.0f, 100.0f));
-    sprite.shape.setTexture(sprite.texture.get());
-    
-    return sprite;
+
+PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, int piece) { 
+    this->piece = piece; 
+    this->texture = texture; 
+    this->shape = sf::RectangleShape(sf::Vector2f(100.0f, 100.0f));
+    this->shape.setTexture(texture.get());
 }
 
 std::vector<PieceSprite> init_sprites(const Board& board, const TextureMap& texture_map) {
@@ -14,9 +13,8 @@ std::vector<PieceSprite> init_sprites(const Board& board, const TextureMap& text
     for (int i = 0; i < 64; ++i) { 
         int piece = board.board[i];
         if (piece != Piece::EMPTY) { 
-            PieceSprite sprite = create_sprite(texture_map.at(piece));
+            PieceSprite sprite = PieceSprite(texture_map.at(piece), piece);
             sprite.shape.setPosition(calculate_position(i));
-            sprite.piece = piece;
             result.push_back(sprite);
         }
     }
@@ -24,6 +22,7 @@ std::vector<PieceSprite> init_sprites(const Board& board, const TextureMap& text
     return result;
 }
 
+// Calculates the position for a sprite based on its index on the board
 sf::Vector2f calculate_position(int index) { 
     int file = index / 8;
     int rank = index % 8; 
@@ -31,6 +30,7 @@ sf::Vector2f calculate_position(int index) {
     return sf::Vector2f(rank * 100, file * 100);
 }
 
+// Calculates the index in the board for a sprite based on its position 
 int calculate_index(const sf::Vector2f& pos) { 
     int x = pos.x / 100; 
     int y = pos.y / 100; 

@@ -13,7 +13,6 @@
 extern sf::RenderWindow main_window; 
 typedef std::unordered_map<int, std::shared_ptr<sf::Texture>> TextureMap; 
 
-void handle_event_loop();
 std::vector<sf::RectangleShape> init_squares();
 TextureMap init_textures(); 
 void debug_print_vector(const sf::Vector2f&);
