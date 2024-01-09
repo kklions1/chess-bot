@@ -1,48 +1,52 @@
 #include "board.hpp" 
 
+void no_vision(Piece& self, int index) { 
+    
+}
+
 void print_board(const Board& board) { 
     int counter = 0;
     std::string result = ""; 
 
     for (int i = 0; i < 64; ++i) { 
-        switch (board.board[i]) { 
-            case Piece::BLACK | Piece::PAWN: 
+        switch (board.board[i].type) { 
+            case PieceType::BLACK | PieceType::PAWN: 
                 result.append("p");
                 break; 
-            case Piece::WHITE | Piece::PAWN: 
+            case PieceType::WHITE | PieceType::PAWN: 
                 result.append("P");
                 break;
-            case Piece::BLACK | Piece::KNIGHT: 
+            case PieceType::BLACK | PieceType::KNIGHT: 
                 result.append("n");
                 break;
-            case Piece::WHITE | Piece::KNIGHT: 
+            case PieceType::WHITE | PieceType::KNIGHT: 
                 result.append("N");
                 break; 
-            case Piece::BLACK | Piece::BISHOP: 
+            case PieceType::BLACK | PieceType::BISHOP: 
                 result.append("b");
                 break;
-            case Piece::WHITE | Piece::BISHOP: 
+            case PieceType::WHITE | PieceType::BISHOP: 
                 result.append("B");
                 break;
-            case Piece::BLACK | Piece::ROOK: 
+            case PieceType::BLACK | PieceType::ROOK: 
                 result.append("r");
                 break;
-            case Piece::WHITE | Piece::ROOK: 
+            case PieceType::WHITE | PieceType::ROOK: 
                 result.append("R");
                 break;
-            case Piece::BLACK | Piece::QUEEN:
+            case PieceType::BLACK | PieceType::QUEEN:
                 result.append("q");
                 break;
-            case Piece::WHITE | Piece::QUEEN: 
+            case PieceType::WHITE | PieceType::QUEEN: 
                 result.append("Q");
                 break;
-            case Piece::BLACK | Piece::KING:
+            case PieceType::BLACK | PieceType::KING:
                 result.append("k");
                 break;
-            case Piece::WHITE | Piece::KING:
+            case PieceType::WHITE | PieceType::KING:
                 result.append("K");
                 break;
-            case Piece::EMPTY: 
+            case PieceType::EMPTY: 
                 result.append("0");
                 break;
         }
@@ -79,57 +83,69 @@ void parse_piece_locations(const std::string& fen, Board& board) {
     int index = 0;
 
     while (it != fen.end()) { 
-        int* square = &board.board[index]; 
+        Piece* current_piece = &board.board[index]; 
         if (isdigit(*it)) { 
             index += (*it - '0'); 
         } else { 
             switch (*it) { 
                 case 'p':
-                    *square = Piece::BLACK | Piece::PAWN; 
+                    current_piece->type = PieceType::BLACK | PieceType::PAWN; 
+                    current_piece->calc_vision = calculate_pawn_vision; 
                     index++;
                     break; 
                 case 'P': 
-                    *square = Piece::WHITE | Piece::PAWN; 
+                    current_piece->type = PieceType::WHITE | PieceType::PAWN;
+                    current_piece->calc_vision = calculate_pawn_vision; 
                     index++;
                     break;
                 case 'n': 
-                    *square = Piece::BLACK | Piece::KNIGHT;
+                    current_piece->type = PieceType::BLACK | PieceType::KNIGHT;
+                    current_piece->calc_vision = no_vision; 
                     index++;
                     break;
                 case 'N': 
-                    *square = Piece::WHITE | Piece::KNIGHT; 
+                    current_piece->type = PieceType::WHITE | PieceType::KNIGHT; 
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break; 
                 case 'b': 
-                    *square = Piece::BLACK | Piece::BISHOP;
+                    current_piece->type = PieceType::BLACK | PieceType::BISHOP;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'B': 
-                    *square = Piece::WHITE | Piece::BISHOP;
+                    current_piece->type = PieceType::WHITE | PieceType::BISHOP;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'r': 
-                    *square = Piece::BLACK | Piece::ROOK;
+                    current_piece->type = PieceType::BLACK | PieceType::ROOK;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'R': 
-                    *square = Piece::WHITE | Piece::ROOK;
+                    current_piece->type = PieceType::WHITE | PieceType::ROOK;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'q':
-                    *square = Piece::BLACK | Piece::QUEEN;
+                    current_piece->type = PieceType::BLACK | PieceType::QUEEN;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'Q': 
-                    *square = Piece::WHITE | Piece::QUEEN;
+                    current_piece->type = PieceType::WHITE | PieceType::QUEEN;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'k':
-                    *square = Piece::BLACK | Piece::KING;
+                    current_piece->type = PieceType::BLACK | PieceType::KING;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'K':
-                    *square = Piece::WHITE | Piece::KING;
+                    current_piece->type = PieceType::WHITE | PieceType::KING;
+                    current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case '/': 
@@ -144,12 +160,12 @@ void parse_piece_locations(const std::string& fen, Board& board) {
 void parse_active_color(const std::string& fen, Board& board) { 
     char active_color = fen.c_str()[0];
     if (active_color == 'w') {
-        board.active_color = Piece::WHITE;
+        board.active_color = PieceType::WHITE;
         return;
     } 
 
     if (active_color == 'b') { 
-        board.active_color = Piece::BLACK;
+        board.active_color = PieceType::BLACK;
         return;
     }
 }
@@ -221,8 +237,6 @@ void parse_fen_string(std::string fen, Board& board) {
 
 }
 
-
-
 std::string generate_fen_string(const Board& board) { 
     std::string fen; 
     // The counter for where to place '/' in the fen string. when this is 8, we need a new line 
@@ -233,7 +247,7 @@ std::string generate_fen_string(const Board& board) {
     int skip_count = 0;
 
     for (int i = 0; i < 64; i++) { 
-        if (board.board[0] == Piece::EMPTY) { 
+        if (board.board[0].type == PieceType::EMPTY) { 
             skip_count++;
             continue;
         }
@@ -243,8 +257,8 @@ std::string generate_fen_string(const Board& board) {
             skip_count = 0;
         }
         
-        switch (board.board[i]) { 
-            case Piece::BLACK | Piece::PAWN: 
+        switch (board.board[i].type) { 
+            case PieceType::BLACK | PieceType::PAWN: 
                 break;
                 
         }

@@ -2,7 +2,6 @@
 
 sf::RenderWindow main_window = sf::RenderWindow(sf::VideoMode(800, 800), "Chess");
 
-
 std::vector<sf::RectangleShape> init_squares() {
     float current_x = 0.0f;
     float current_y = 0.0f;
@@ -75,18 +74,18 @@ TextureMap init_textures() {
     if (!white_king->loadFromFile("../assets/white-king.png")) throw std::runtime_error("file not found: white-king.png");
 
     TextureMap texture_map = {
-        { Piece::BLACK | Piece::PAWN, black_pawn },
-        { Piece::BLACK | Piece::ROOK, black_rook },
-        { Piece::BLACK | Piece::KNIGHT, black_horse },
-        { Piece::BLACK | Piece::BISHOP, black_bishop },
-        { Piece::BLACK | Piece::QUEEN, black_queen },
-        { Piece::BLACK | Piece::KING, black_king },
-        { Piece::WHITE | Piece::PAWN, white_pawn },
-        { Piece::WHITE | Piece::ROOK, white_rook },
-        { Piece::WHITE | Piece::KNIGHT, white_horse },
-        { Piece::WHITE | Piece::BISHOP, white_bishop },
-        { Piece::WHITE | Piece::QUEEN, white_queen },
-        { Piece::WHITE | Piece::KING, white_king },
+        { PieceType::BLACK | PieceType::PAWN, black_pawn },
+        { PieceType::BLACK | PieceType::ROOK, black_rook },
+        { PieceType::BLACK | PieceType::KNIGHT, black_horse },
+        { PieceType::BLACK | PieceType::BISHOP, black_bishop },
+        { PieceType::BLACK | PieceType::QUEEN, black_queen },
+        { PieceType::BLACK | PieceType::KING, black_king },
+        { PieceType::WHITE | PieceType::PAWN, white_pawn },
+        { PieceType::WHITE | PieceType::ROOK, white_rook },
+        { PieceType::WHITE | PieceType::KNIGHT, white_horse },
+        { PieceType::WHITE | PieceType::BISHOP, white_bishop },
+        { PieceType::WHITE | PieceType::QUEEN, white_queen },
+        { PieceType::WHITE | PieceType::KING, white_king },
     };
 
     return texture_map;

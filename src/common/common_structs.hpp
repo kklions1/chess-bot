@@ -1,20 +1,12 @@
 #pragma once 
 
-typedef enum Piece { 
-    EMPTY = 0, 
-    PAWN = 1, 
-    KNIGHT = 2, 
-    BISHOP  = 3, 
-    ROOK = 4, 
-    QUEEN = 5, 
-    KING = 6, 
+#include "piece.hpp"
+#include "piece_type.hpp"
 
-    WHITE = 8,
-    BLACK = 16 
-} Piece; 
+typedef unsigned long long Bitboard; 
 
 typedef struct Board { 
-    int board[64]; 
+    Piece board[64]; 
 
     bool white_castle_short; 
     bool white_castle_long; 
@@ -25,10 +17,10 @@ typedef struct Board {
     int halfmove_clock; 
     int fullmove_clock; 
 
-    int active_color; 
+    int active_color;
 
     Board() :
-        board { Piece::EMPTY },
+        board { Piece() },
         white_castle_short(false), white_castle_long(false),
         black_castle_short(false), black_castle_long(false), 
         en_passant_target(-1), halfmove_clock(0), fullmove_clock(0),

@@ -1,6 +1,5 @@
 #include "piece_sprite.hpp"
 
-
 PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, int piece) { 
     this->piece = piece; 
     this->texture = texture; 
@@ -11,8 +10,8 @@ PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, int piece) {
 std::vector<PieceSprite> init_sprites(const Board& board, const TextureMap& texture_map) {
     std::vector<PieceSprite> result;
     for (int i = 0; i < 64; ++i) { 
-        int piece = board.board[i];
-        if (piece != Piece::EMPTY) { 
+        int piece = board.board[i].type;
+        if (piece != PieceType::EMPTY) { 
             PieceSprite sprite = PieceSprite(texture_map.at(piece), piece);
             sprite.shape.setPosition(calculate_position(i));
             result.push_back(sprite);
