@@ -2,6 +2,9 @@
 
 #include <vector>
 
+extern int piece_mask;
+extern int color_mask;
+
 typedef enum PieceType { 
     EMPTY = 0, 
     PAWN = 1, 
@@ -16,13 +19,15 @@ typedef enum PieceType {
 } PieceType; 
 
 typedef struct Piece { 
-    int type; 
+    int data; 
     std::vector<int> vision; 
 
     void (*calc_vision)(Piece&, int); 
 
-    Piece(): type(0), vision(std::vector<int>()), calc_vision([](Piece& self, int index) { /* no-op */ }) {}
-    Piece(int type, void (*vision)(Piece&, int)): type(type), calc_vision(vision) {} 
+    int color();
+    int type();
+
+    Piece(): data(PieceType::EMPTY), vision(std::vector<int>()), calc_vision([](Piece& self, int index) { /* no-op */ }) {}
 } Piece; 
 
 void calculate_pawn_vision(Piece&, int);

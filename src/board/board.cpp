@@ -9,7 +9,7 @@ void print_board(const Board& board) {
     std::string result = ""; 
 
     for (int i = 0; i < 64; ++i) { 
-        switch (board.board[i].type) { 
+        switch (board.board[i].data) { 
             case PieceType::BLACK | PieceType::PAWN: 
                 result.append("p");
                 break; 
@@ -89,62 +89,62 @@ void parse_piece_locations(const std::string& fen, Board& board) {
         } else { 
             switch (*it) { 
                 case 'p':
-                    current_piece->type = PieceType::BLACK | PieceType::PAWN; 
+                    current_piece->data = PieceType::BLACK | PieceType::PAWN; 
                     current_piece->calc_vision = calculate_pawn_vision; 
                     index++;
                     break; 
                 case 'P': 
-                    current_piece->type = PieceType::WHITE | PieceType::PAWN;
+                    current_piece->data = PieceType::WHITE | PieceType::PAWN;
                     current_piece->calc_vision = calculate_pawn_vision; 
                     index++;
                     break;
                 case 'n': 
-                    current_piece->type = PieceType::BLACK | PieceType::KNIGHT;
+                    current_piece->data = PieceType::BLACK | PieceType::KNIGHT;
                     current_piece->calc_vision = no_vision; 
                     index++;
                     break;
                 case 'N': 
-                    current_piece->type = PieceType::WHITE | PieceType::KNIGHT; 
+                    current_piece->data = PieceType::WHITE | PieceType::KNIGHT; 
                     current_piece->calc_vision = no_vision;
                     index++;
                     break; 
                 case 'b': 
-                    current_piece->type = PieceType::BLACK | PieceType::BISHOP;
+                    current_piece->data = PieceType::BLACK | PieceType::BISHOP;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'B': 
-                    current_piece->type = PieceType::WHITE | PieceType::BISHOP;
+                    current_piece->data = PieceType::WHITE | PieceType::BISHOP;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'r': 
-                    current_piece->type = PieceType::BLACK | PieceType::ROOK;
+                    current_piece->data = PieceType::BLACK | PieceType::ROOK;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'R': 
-                    current_piece->type = PieceType::WHITE | PieceType::ROOK;
+                    current_piece->data = PieceType::WHITE | PieceType::ROOK;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'q':
-                    current_piece->type = PieceType::BLACK | PieceType::QUEEN;
+                    current_piece->data = PieceType::BLACK | PieceType::QUEEN;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'Q': 
-                    current_piece->type = PieceType::WHITE | PieceType::QUEEN;
+                    current_piece->data = PieceType::WHITE | PieceType::QUEEN;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'k':
-                    current_piece->type = PieceType::BLACK | PieceType::KING;
+                    current_piece->data = PieceType::BLACK | PieceType::KING;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
                 case 'K':
-                    current_piece->type = PieceType::WHITE | PieceType::KING;
+                    current_piece->data = PieceType::WHITE | PieceType::KING;
                     current_piece->calc_vision = no_vision;
                     index++;
                     break;
@@ -247,7 +247,7 @@ std::string generate_fen_string(const Board& board) {
     int skip_count = 0;
 
     for (int i = 0; i < 64; i++) { 
-        if (board.board[0].type == PieceType::EMPTY) { 
+        if (board.board[0].data == PieceType::EMPTY) { 
             skip_count++;
             continue;
         }
@@ -257,7 +257,7 @@ std::string generate_fen_string(const Board& board) {
             skip_count = 0;
         }
         
-        switch (board.board[i].type) { 
+        switch (board.board[i].data) { 
             case PieceType::BLACK | PieceType::PAWN: 
                 break;
                 

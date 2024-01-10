@@ -99,33 +99,60 @@ void debug_print_vector(const sf::Vector2f& vec) {
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }
 
+void show_moves_for_piece(PieceSprite* vision_target) { 
+
+}
+
 void gui_main(const Board& board) {
     auto texture_map = init_textures();
     auto squares = init_squares();
     auto pieces = init_sprites(board, texture_map);
+    std::vector<sf::CircleShape> legal_move_indicator;
     PieceSprite* drag_target;
+    PieceSprite* vision_target;
     bool is_dragging = false;
 
     while (main_window.isOpen()) {
         sf::Event event;
         while (main_window.pollEvent(event)) {
             switch (event.type) {
-                case sf::Event::Closed:
+                case sf::Event::Closed: { 
                     main_window.close();
                     break;
-                case sf::Event::MouseButtonPressed:
+                }
+                case sf::Event::MouseButtonPressed: { 
                     // std::cout << "Button pressed: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    drag_target = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces); 
+                    PieceSprite* sprite_ptr = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces);
+                    drag_target = sprite_ptr; 
+                    vision_target = sprite_ptr; 
+                    show_moves_for_piece(vision_target);
                     is_dragging = true;
                     break;
-                case sf::Event::MouseButtonReleased:
+                }
+                case sf::Event::MouseButtonReleased: { 
                     // std::cout << "Button released: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
                     snap_piece_to_square(sf::Vector2f(sf::Mouse::getPosition(main_window)), drag_target);
                     is_dragging = false;
                     drag_target = nullptr;
                     break;
-                default:
+                }
+                case sf::Event::KeyPressed: { 
+                    switch (event.key.code) { 
+                        case sf::Keyboard::Backspace: { 
+                            vision_target = nullptr;
+                            legal_move_indicator.clear();
+                            std::cout << "clear spaces!" << std::endl;
+                            break;
+                        }
+                        default: { 
+                            break;
+                        }
+                    }
                     break;
+                }
+                default: { 
+                    break;
+                }
             }
         }
 
@@ -144,6 +171,10 @@ void gui_main(const Board& board) {
 
         for (auto p : pieces) { 
             main_window.draw(p.shape);
+        }
+
+        for (auto move : legal_move_indicator) { 
+            main_window.draw(move);
         }
 
         main_window.display();
