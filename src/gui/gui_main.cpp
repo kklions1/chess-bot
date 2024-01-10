@@ -99,11 +99,21 @@ void debug_print_vector(const sf::Vector2f& vec) {
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }
 
-void show_moves_for_piece(PieceSprite* vision_target) { 
+void show_moves_for_piece(PieceSprite* vision_target, std::vector<sf::CircleShape>& legal_move_indicatior) { 
+    if (vision_target == nullptr) return;
 
+    std::vector<int> vision = vision_target->piece->vision; 
+    for (int i : vision) { 
+        sf::Vector2f position = calculate_position(i);
+        sf::CircleShape indicator(50.0f);
+        indicator.setFillColor(sf::Color(0, 0, 0, 100));
+        indicator.setPosition(position);
+
+        legal_move_indicatior.push_back(indicator);
+    }
 }
 
-void gui_main(const Board& board) {
+void gui_main(Board& board) {
     auto texture_map = init_textures();
     auto squares = init_squares();
     auto pieces = init_sprites(board, texture_map);
@@ -125,7 +135,7 @@ void gui_main(const Board& board) {
                     PieceSprite* sprite_ptr = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces);
                     drag_target = sprite_ptr; 
                     vision_target = sprite_ptr; 
-                    show_moves_for_piece(vision_target);
+                    show_moves_for_piece(vision_target, legal_move_indicator);
                     is_dragging = true;
                     break;
                 }

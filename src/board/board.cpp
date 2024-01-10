@@ -1,7 +1,7 @@
 #include "board.hpp" 
 
 void no_vision(Piece& self, int index) { 
-    
+    /* no-op */ 
 }
 
 void print_board(const Board& board) { 
@@ -352,4 +352,13 @@ void print_index() {
     std::cout << i << " ";
     counter++;
   }
+}
+
+void update_all_vision(Board& self) { 
+    for (int i = 0; i < 64; ++i) { 
+        Piece* current = &self.board[i];
+        if (current != nullptr && current->data != PieceType::EMPTY && current->calc_vision != nullptr) { 
+            current->calc_vision(*current, i);
+        }
+    }
 }
