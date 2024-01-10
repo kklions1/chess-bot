@@ -357,8 +357,10 @@ void print_index() {
 void update_all_vision(Board& self) { 
     for (int i = 0; i < 64; ++i) { 
         Piece* current = &self.board[i];
-        if (current != nullptr && current->data != PieceType::EMPTY && current->calc_vision != nullptr) { 
-            current->calc_vision(*current, i);
-        }
+        if (current == nullptr) continue;
+        if (current->data == PieceType::EMPTY) continue;
+        if (current->calc_vision == nullptr) continue;
+        
+        current->calc_vision(*current, i);
     }
 }

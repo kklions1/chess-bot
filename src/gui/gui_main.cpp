@@ -135,6 +135,7 @@ void gui_main(Board& board) {
                     PieceSprite* sprite_ptr = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces);
                     drag_target = sprite_ptr; 
                     vision_target = sprite_ptr; 
+                    legal_move_indicator.clear();
                     show_moves_for_piece(vision_target, legal_move_indicator);
                     is_dragging = true;
                     break;

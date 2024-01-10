@@ -48,7 +48,7 @@ PieceSprite* get_piece_at_position(const sf::Vector2i& click_pos, std::vector<Pi
 }
 
 void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite* sprite) { 
-    if (sprite != nullptr) { 
-        sprite->shape.setPosition(sf::Vector2f(normalize_to_corner(mouse_pos)));
-    }
+    if (sprite == nullptr) return;
+
+    sprite->shape.setPosition(sf::Vector2f(normalize_to_corner(mouse_pos)));
 }
