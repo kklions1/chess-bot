@@ -99,7 +99,7 @@ void debug_print_vector(const sf::Vector2f& vec) {
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }
 
-void show_moves_for_piece(PieceSprite* vision_target, std::vector<sf::CircleShape>& legal_move_indicatior) { 
+void show_moves_for_piece(std::shared_ptr<PieceSprite> vision_target, std::vector<sf::CircleShape>& legal_move_indicatior) { 
     if (vision_target == nullptr) return;
 
     std::vector<int> vision = vision_target->piece->vision; 
@@ -118,8 +118,8 @@ void gui_main(Board& board) {
     auto squares = init_squares();
     auto pieces = init_sprites(board, texture_map);
     std::vector<sf::CircleShape> legal_move_indicator;
-    PieceSprite* drag_target;
-    PieceSprite* vision_target;
+    std::shared_ptr<PieceSprite> drag_target;
+    std::shared_ptr<PieceSprite> vision_target;
     bool is_dragging = false;
 
     while (main_window.isOpen()) {
@@ -132,7 +132,7 @@ void gui_main(Board& board) {
                 }
                 case sf::Event::MouseButtonPressed: { 
                     // std::cout << "Button pressed: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    PieceSprite* sprite_ptr = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces);
+                    auto sprite_ptr = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces);
                     drag_target = sprite_ptr; 
                     vision_target = sprite_ptr; 
                     legal_move_indicator.clear();
@@ -181,7 +181,7 @@ void gui_main(Board& board) {
         }
 
         for (auto p : pieces) { 
-            main_window.draw(p.shape);
+            main_window.draw(p->shape);
         }
 
         for (auto move : legal_move_indicator) { 

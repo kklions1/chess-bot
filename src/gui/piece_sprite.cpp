@@ -7,13 +7,14 @@ PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, std::shared_ptr<P
     this->shape.setTexture(texture.get());
 }
 
-std::vector<PieceSprite> init_sprites(Board& board, const TextureMap& texture_map) {
-    std::vector<PieceSprite> result;
+std::vector<std::shared_ptr<PieceSprite>> init_sprites(Board& board, const TextureMap& texture_map) {
+    std::vector<std::shared_ptr<PieceSprite>> result;
     for (int i = 0; i < 64; ++i) { 
         auto piece = board.board[i];
         if (piece->data != PieceType::EMPTY) { 
-            PieceSprite sprite = PieceSprite(texture_map.at(piece->data), piece);
-            sprite.shape.setPosition(calculate_position(i));
+            auto sprite = std::make_shared<PieceSprite>(texture_map.at(piece->data), piece);
+                // PieceSprite(texture_map.at(piece->data), piece);
+            sprite->shape.setPosition(calculate_position(i));
             result.push_back(sprite);
         }
     }
@@ -37,18 +38,18 @@ int calculate_index(const sf::Vector2f& pos) {
     return (x * 8) + y; 
 }
 
-PieceSprite* get_piece_at_position(const sf::Vector2i& click_pos, std::vector<PieceSprite>& sprites) {
+std::shared_ptr<PieceSprite> get_piece_at_position(const sf::Vector2i& click_pos, std::vector<std::shared_ptr<PieceSprite>>& sprites) {
     for (int i = 0; i < sprites.size(); ++i) { 
-        if (sprites[i].shape.getGlobalBounds().contains(sf::Vector2f(click_pos))) { 
-            return &sprites[i]; 
+        if (sprites[i]->shape.getGlobalBounds().contains(sf::Vector2f(click_pos))) { 
+            return sprites[i]; 
         }
     }
 
     return nullptr;
 }
 
-void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite* sprite) { 
+void snap_piece_to_square(const sf::Vector2f& mouse_pos, std::shared_ptr<PieceSprite> sprite) { 
     if (sprite == nullptr) return;
 
-    sprite->shape.setPosition(sf::Vector2f(normalize_to_corner(mouse_pos)));
+    sprite->shape.setPosition(normalize_to_corner(mouse_pos));
 }

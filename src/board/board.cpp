@@ -1,7 +1,6 @@
 #include "board.hpp" 
 
 Board::Board() :
-    // board { std::make_shared<Piece>() },
     white_castle_short(false), white_castle_long(false),
     black_castle_short(false), black_castle_long(false), 
     en_passant_target(-1), halfmove_clock(0), fullmove_clock(0),
@@ -94,7 +93,6 @@ void parse_piece_locations(const std::string& fen, Board& board) {
     int index = 0;
 
     while (it != fen.end()) { 
-        std::cout << "current_piece at: " << index << ", " << board.board[index].get() << std::endl;
         std::shared_ptr<Piece> current_piece = board.board[index]; 
         if (isdigit(*it)) { 
             index += (*it - '0'); 
