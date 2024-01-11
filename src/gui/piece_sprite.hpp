@@ -8,9 +8,9 @@ typedef std::unordered_map<int, std::shared_ptr<sf::Texture>> TextureMap;
 typedef struct PieceSprite { 
     std::shared_ptr<sf::Texture> texture;
     sf::RectangleShape shape;
-    Piece* piece;
+    std::shared_ptr<Piece> piece;
 
-    PieceSprite(std::shared_ptr<sf::Texture>, Piece*); 
+    PieceSprite(std::shared_ptr<sf::Texture>, std::shared_ptr<Piece>); 
 } PieceSprite; 
 
 sf::Vector2f calculate_position(int);

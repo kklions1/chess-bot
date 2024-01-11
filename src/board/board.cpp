@@ -1,5 +1,16 @@
 #include "board.hpp" 
 
+Board::Board() :
+    // board { std::make_shared<Piece>() },
+    white_castle_short(false), white_castle_long(false),
+    black_castle_short(false), black_castle_long(false), 
+    en_passant_target(-1), halfmove_clock(0), fullmove_clock(0),
+    active_color(-1) {
+        for (int i = 0; i < 64; ++i) { 
+            board[i] = std::make_shared<Piece>();
+        }
+    }
+
 void no_vision(Piece& self, int index) { 
     /* no-op */ 
 }
@@ -9,7 +20,7 @@ void print_board(const Board& board) {
     std::string result = ""; 
 
     for (int i = 0; i < 64; ++i) { 
-        switch (board.board[i].data) { 
+        switch (board.board[i]->data) { 
             case PieceType::BLACK | PieceType::PAWN: 
                 result.append("p");
                 break; 
@@ -83,7 +94,8 @@ void parse_piece_locations(const std::string& fen, Board& board) {
     int index = 0;
 
     while (it != fen.end()) { 
-        Piece* current_piece = &board.board[index]; 
+        std::cout << "current_piece at: " << index << ", " << board.board[index].get() << std::endl;
+        std::shared_ptr<Piece> current_piece = board.board[index]; 
         if (isdigit(*it)) { 
             index += (*it - '0'); 
         } else { 
@@ -247,7 +259,7 @@ std::string generate_fen_string(const Board& board) {
     int skip_count = 0;
 
     for (int i = 0; i < 64; i++) { 
-        if (board.board[0].data == PieceType::EMPTY) { 
+        if (board.board[0]->data == PieceType::EMPTY) { 
             skip_count++;
             continue;
         }
@@ -257,7 +269,7 @@ std::string generate_fen_string(const Board& board) {
             skip_count = 0;
         }
         
-        switch (board.board[i].data) { 
+        switch (board.board[i]->data) { 
             case PieceType::BLACK | PieceType::PAWN: 
                 break;
                 
@@ -356,7 +368,8 @@ void print_index() {
 
 void update_all_vision(Board& self) { 
     for (int i = 0; i < 64; ++i) { 
-        Piece* current = &self.board[i];
+        auto current = self.board[i];
+
         if (current == nullptr) continue;
         if (current->data == PieceType::EMPTY) continue;
         if (current->calc_vision == nullptr) continue;
