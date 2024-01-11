@@ -99,7 +99,7 @@ void debug_print_vector(const sf::Vector2f& vec) {
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }
 
-void show_moves_for_piece(std::shared_ptr<PieceSprite> vision_target, std::vector<sf::CircleShape>& legal_move_indicatior) { 
+void show_moves_for_piece(PieceSprite_ptr vision_target, std::vector<sf::CircleShape>& legal_move_indicatior) { 
     if (vision_target == nullptr) return;
 
     std::vector<int> vision = vision_target->piece->vision; 
@@ -118,8 +118,8 @@ void gui_main(Board& board) {
     auto squares = init_squares();
     auto pieces = init_sprites(board, texture_map);
     std::vector<sf::CircleShape> legal_move_indicator;
-    std::shared_ptr<PieceSprite> drag_target;
-    std::shared_ptr<PieceSprite> vision_target;
+    PieceSprite_ptr drag_target;
+    PieceSprite_ptr vision_target;
     bool is_dragging = false;
 
     while (main_window.isOpen()) {

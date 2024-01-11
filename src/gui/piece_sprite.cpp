@@ -1,14 +1,14 @@
 #include "piece_sprite.hpp"
 
-PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, std::shared_ptr<Piece> piece) { 
+PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, Piece_ptr piece) { 
     this->piece = piece; 
     this->texture = texture; 
     this->shape = sf::RectangleShape(sf::Vector2f(100.0f, 100.0f));
     this->shape.setTexture(texture.get());
 }
 
-std::vector<std::shared_ptr<PieceSprite>> init_sprites(Board& board, const TextureMap& texture_map) {
-    std::vector<std::shared_ptr<PieceSprite>> result;
+std::vector<PieceSprite_ptr> init_sprites(Board& board, const TextureMap& texture_map) {
+    std::vector<PieceSprite_ptr> result;
     for (int i = 0; i < 64; ++i) { 
         auto piece = board.board[i];
         if (piece->data != PieceType::EMPTY) { 
@@ -38,7 +38,7 @@ int calculate_index(const sf::Vector2f& pos) {
     return (x * 8) + y; 
 }
 
-std::shared_ptr<PieceSprite> get_piece_at_position(const sf::Vector2i& click_pos, std::vector<std::shared_ptr<PieceSprite>>& sprites) {
+PieceSprite_ptr get_piece_at_position(const sf::Vector2i& click_pos, std::vector<PieceSprite_ptr>& sprites) {
     for (int i = 0; i < sprites.size(); ++i) { 
         if (sprites[i]->shape.getGlobalBounds().contains(sf::Vector2f(click_pos))) { 
             return sprites[i]; 
@@ -48,7 +48,7 @@ std::shared_ptr<PieceSprite> get_piece_at_position(const sf::Vector2i& click_pos
     return nullptr;
 }
 
-void snap_piece_to_square(const sf::Vector2f& mouse_pos, std::shared_ptr<PieceSprite> sprite) { 
+void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite_ptr sprite) { 
     if (sprite == nullptr) return;
 
     sprite->shape.setPosition(normalize_to_corner(mouse_pos));

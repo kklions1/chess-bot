@@ -5,7 +5,7 @@
 #include <memory>
 
 typedef struct Board { 
-    std::shared_ptr<Piece> board[64];
+    Piece_ptr board[64];
 
     bool white_castle_short;
     bool white_castle_long;
