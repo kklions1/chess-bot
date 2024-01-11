@@ -110,22 +110,22 @@ void parse_piece_locations(const std::string& fen, Board& board) {
                     break; 
                 case 'b': 
                     current_piece->data = PieceType::BLACK | PieceType::BISHOP;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_bishop_vision;
                     index++;
                     break;
                 case 'B': 
                     current_piece->data = PieceType::WHITE | PieceType::BISHOP;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_bishop_vision;
                     index++;
                     break;
                 case 'r': 
                     current_piece->data = PieceType::BLACK | PieceType::ROOK;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_rook_vision;
                     index++;
                     break;
                 case 'R': 
                     current_piece->data = PieceType::WHITE | PieceType::ROOK;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_rook_vision;
                     index++;
                     break;
                 case 'q':

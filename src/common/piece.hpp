@@ -36,7 +36,7 @@ typedef struct Piece {
     Piece(): data(PieceType::EMPTY), vision(std::vector<int>()), calc_vision([](Piece& self, int index) { /* no-op */ }) {}
 } Piece; 
 
-
-
 void calculate_pawn_vision(Piece&, int);
+void calculate_rook_vision(Piece&, int);
+void calculate_bishop_vision(Piece&, int);
 
