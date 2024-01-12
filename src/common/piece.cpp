@@ -100,6 +100,74 @@ void calculate_bishop_vision(Piece& self, int index) {
     bool on_top_edge = top_edges.contains(index);
     bool on_bottom_edge = bottom_edges.contains(index);
 
+    // cast ray up-left
+    if (!on_left_edge && !on_top_edge) { 
+        int current = index - 9; 
+        while (!left_edges.contains(current) && !top_edges.contains(current)) { 
+            self.vision.push_back(current);
+            current -= 9;
+        }
+
+        self.vision.push_back(current);
+    }
+
+    // cast ray up-right
+    if (!on_right_edge && !on_top_edge) { 
+        int current = index - 7; 
+        while (!right_edges.contains(current) && !top_edges.contains(current)) { 
+            self.vision.push_back(current);
+            current -= 7;
+        }
+
+        self.vision.push_back(current);
+    }
+
+    // cast ray down-left
+    if (!on_left_edge && !on_bottom_edge) { 
+        int current = index + 7; 
+        while (!left_edges.contains(current) && !bottom_edges.contains(current)) { 
+            self.vision.push_back(current);
+            current += 7;
+        }
+
+        self.vision.push_back(current);
+    }
+
+    // cast ray down-right
+    if (!on_right_edge && !on_bottom_edge) { 
+        int current = index + 9; 
+        while (!right_edges.contains(current) && !bottom_edges.contains(current)) { 
+            self.vision.push_back(current);
+            current += 9;
+        }
+
+        self.vision.push_back(current);
+    }
+}
+
+void calculate_horsy_vision(Piece& self, int index) { 
     
+}
+
+void calculate_queen_vision(Piece& self, int index) { 
+    calculate_bishop_vision(self, index);
+    calculate_rook_vision(self, index);
+}
+
+void calculate_king_vision(Piece& self, int index) { 
+    bool on_left_edge = left_edges.contains(index);
+    bool on_right_edge = right_edges.contains(index);
+    bool on_top_edge = top_edges.contains(index);
+    bool on_bottom_edge = bottom_edges.contains(index);
+
+    if (!on_left_edge) self.vision.push_back(index - 1);
+    if (!on_right_edge) self.vision.push_back(index + 1);
+    if (!on_bottom_edge) self.vision.push_back(index + 8);
+    if (!on_top_edge) self.vision.push_back(index - 8);
+
+    if (!on_left_edge && !on_top_edge) self.vision.push_back(index - 9);
+    if (!on_left_edge && !on_bottom_edge) self.vision.push_back(index + 7);
+    if (!on_right_edge && !on_top_edge) self.vision.push_back(index - 7);
+    if (!on_right_edge && !on_bottom_edge) self.vision.push_back(index + 9);
 
 }

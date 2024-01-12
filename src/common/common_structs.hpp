@@ -18,6 +18,8 @@ typedef struct Board {
 
     int active_color;
 
+    void move_piece(int, int);
+
     Board();
 } Board; 
 

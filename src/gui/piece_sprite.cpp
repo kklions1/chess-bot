@@ -13,7 +13,6 @@ std::vector<PieceSprite_ptr> init_sprites(Board& board, const TextureMap& textur
         auto piece = board.board[i];
         if (piece->data != PieceType::EMPTY) { 
             auto sprite = std::make_shared<PieceSprite>(texture_map.at(piece->data), piece);
-                // PieceSprite(texture_map.at(piece->data), piece);
             sprite->shape.setPosition(calculate_position(i));
             result.push_back(sprite);
         }
@@ -31,6 +30,13 @@ sf::Vector2f calculate_position(int index) {
 }
 
 // Calculates the index in the board for a sprite based on its position 
+int calculate_index(const sf::Vector2i& pos) { 
+    int x = pos.x / 100; 
+    int y = pos.y / 100; 
+
+    return (x * 8) + y; 
+}
+
 int calculate_index(const sf::Vector2f& pos) { 
     int x = pos.x / 100; 
     int y = pos.y / 100; 

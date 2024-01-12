@@ -31,8 +31,6 @@ int main(int argc, char** argv) {
 
     print_index();
    
-
-
     if (draw_gui) { 
         gui_main(*game_board);
     } else { 

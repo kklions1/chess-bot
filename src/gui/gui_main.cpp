@@ -120,6 +120,7 @@ void gui_main(Board& board) {
     std::vector<sf::CircleShape> legal_move_indicator;
     PieceSprite_ptr drag_target;
     PieceSprite_ptr vision_target;
+    int move_target_starting_index;
     bool is_dragging = false;
 
     while (main_window.isOpen()) {
@@ -131,8 +132,9 @@ void gui_main(Board& board) {
                     break;
                 }
                 case sf::Event::MouseButtonPressed: { 
-                    // std::cout << "Button pressed: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    auto sprite_ptr = get_piece_at_position(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), pieces);
+                    sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
+                    auto sprite_ptr = get_piece_at_position(mouse_pos, pieces);
+                    move_target_starting_index = calculate_index(mouse_pos);
                     drag_target = sprite_ptr; 
                     vision_target = sprite_ptr; 
                     legal_move_indicator.clear();
@@ -141,8 +143,9 @@ void gui_main(Board& board) {
                     break;
                 }
                 case sf::Event::MouseButtonReleased: { 
-                    // std::cout << "Button released: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")\n";
-                    snap_piece_to_square(sf::Vector2f(sf::Mouse::getPosition(main_window)), drag_target);
+                    sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
+                    snap_piece_to_square(mouse_pos, drag_target);
+                    board.move_piece(move_target_starting_index, calculate_index(mouse_pos));
                     is_dragging = false;
                     drag_target = nullptr;
                     break;

@@ -18,6 +18,7 @@ typedef struct PieceSprite {
 typedef std::shared_ptr<PieceSprite> PieceSprite_ptr; 
 
 sf::Vector2f calculate_position(int);
+int calculate_index(const sf::Vector2i&);
 int calculate_index(const sf::Vector2f&);
 PieceSprite_ptr get_piece_at_position(const sf::Vector2i&, std::vector<PieceSprite_ptr>&);
 void snap_piece_to_square(const sf::Vector2f&, PieceSprite_ptr);

@@ -10,6 +10,23 @@ Board::Board() :
         }
     }
 
+void Board::move_piece(int start, int target) { 
+    Piece_ptr move_target = this->board[start];
+    Piece_ptr destination_target = this->board[target];
+
+    if (destination_target->data == PieceType::EMPTY) { 
+        Piece_ptr temp = destination_target;
+        this->board[target] = move_target;
+        this->board[start] = temp; 
+
+        move_target->calc_vision(*move_target, target);
+    }
+
+    if (destination_target->color() != move_target->color()) { 
+        
+    }
+}
+
 void no_vision(Piece& self, int index) { 
     /* no-op */ 
 }
@@ -110,12 +127,12 @@ void parse_piece_locations(const std::string& fen, Board& board) {
                     break;
                 case 'n': 
                     current_piece->data = PieceType::BLACK | PieceType::KNIGHT;
-                    current_piece->calc_vision = no_vision; 
+                    current_piece->calc_vision = calculate_horsy_vision; 
                     index++;
                     break;
                 case 'N': 
                     current_piece->data = PieceType::WHITE | PieceType::KNIGHT; 
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_horsy_vision;
                     index++;
                     break; 
                 case 'b': 
@@ -140,22 +157,22 @@ void parse_piece_locations(const std::string& fen, Board& board) {
                     break;
                 case 'q':
                     current_piece->data = PieceType::BLACK | PieceType::QUEEN;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_queen_vision;
                     index++;
                     break;
                 case 'Q': 
                     current_piece->data = PieceType::WHITE | PieceType::QUEEN;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_queen_vision;
                     index++;
                     break;
                 case 'k':
                     current_piece->data = PieceType::BLACK | PieceType::KING;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_king_vision;
                     index++;
                     break;
                 case 'K':
                     current_piece->data = PieceType::WHITE | PieceType::KING;
-                    current_piece->calc_vision = no_vision;
+                    current_piece->calc_vision = calculate_king_vision;
                     index++;
                     break;
                 case '/': 
