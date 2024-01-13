@@ -144,11 +144,14 @@ void gui_main(Board& board) {
                     break;
                 }
                 case sf::Event::MouseButtonReleased: { 
+                    is_dragging = false;
+                    if (drag_target == nullptr) break;
+
                     sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
                     snap_piece_to_square(mouse_pos, drag_target);
                     board.move_piece(move_target_starting_index, calculate_index(drag_target->shape.getPosition()));
-                    is_dragging = false;
                     drag_target = nullptr;
+                    // TODO Board::move_piece should return bool. check here for completed move. if completed, reset vision display
                     break;
                 }
                 case sf::Event::KeyPressed: { 

@@ -28,7 +28,6 @@ int Piece::type() {
 std::string Piece::name() { 
     std::string name = ""; 
 
-    std::cout << "Here?" << std::endl;
     switch(this->color()) { 
         case PieceType::WHITE:
             name.append("White ");
@@ -40,8 +39,6 @@ std::string Piece::name() {
             name.append("wat");
             break;
     }
-
-        std::cout << "Here?" << std::endl;
 
     switch (this->type()) { 
         case PieceType::PAWN: 
@@ -66,9 +63,6 @@ std::string Piece::name() {
             name.append("wat");
             break;
     }
-
-        std::cout << "Here?" << std::endl;
-
 
     return name;
 }
@@ -106,7 +100,7 @@ void calculate_rook_vision(Piece& self, int index) {
     bool cast_up = !top_edges.contains(index);
     bool cast_down = !bottom_edges.contains(index);
 
-    int left_current = index -1;
+    int left_current = index - 1;
     if (cast_left) {
         while (!left_edges.contains(left_current)) { 
             self.vision.push_back(left_current); 

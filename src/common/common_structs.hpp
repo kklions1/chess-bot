@@ -1,8 +1,9 @@
 #pragma once 
 
 #include "piece.hpp"
+#include "enum.hpp"
 
-#include <memory>
+#include <memory> 
 
 typedef struct Board { 
     Piece_ptr board[64];
@@ -19,6 +20,7 @@ typedef struct Board {
     int active_color;
 
     void move_piece(int, int);
+    void prune_illegal_moves(Piece_ptr, int);
 
     Board();
 } Board; 

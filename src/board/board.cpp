@@ -30,6 +30,10 @@ void Board::move_piece(int start, int target) {
     // }
 }
 
+void Board::prune_illegal_moves(Piece_ptr piece, int piece_index) { 
+
+}
+
 void no_vision(Piece& self, int index) { 
     /* no-op */ 
 }
