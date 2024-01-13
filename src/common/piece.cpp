@@ -1,5 +1,7 @@
 #include "piece.hpp"
 
+#include <iostream>
+
 int color_mask = 0b11000;
 int piece_mask = 0b00111;
 
@@ -23,7 +25,56 @@ int Piece::type() {
     return piece_mask & this->data;
 }
 
+std::string Piece::name() { 
+    std::string name = ""; 
+
+    std::cout << "Here?" << std::endl;
+    switch(this->color()) { 
+        case PieceType::WHITE:
+            name.append("White ");
+            break;
+        case PieceType::BLACK: 
+            name.append("Black ");
+            break;
+        default:
+            name.append("wat");
+            break;
+    }
+
+        std::cout << "Here?" << std::endl;
+
+    switch (this->type()) { 
+        case PieceType::PAWN: 
+            name.append("Pawn");
+            break;
+        case PieceType::BISHOP: 
+            name.append("Bishop");
+            break;
+        case PieceType::KNIGHT: 
+            name.append("Horse");
+            break;
+        case PieceType::ROOK: 
+            name.append("Rook");
+            break;
+        case PieceType::QUEEN: 
+            name.append("Queen");
+            break;
+        case PieceType::KING: 
+            name.append("King");
+            break;
+        default: 
+            name.append("wat");
+            break;
+    }
+
+        std::cout << "Here?" << std::endl;
+
+
+    return name;
+}
+
 void calculate_pawn_vision(Piece& self, int index) { 
+    self.vision.clear();
     int left, right, advance; 
 
     if (self.color() == PieceType::WHITE) { 
@@ -48,6 +99,8 @@ void calculate_pawn_vision(Piece& self, int index) {
 }
 
 void calculate_rook_vision(Piece& self, int index) { 
+    self.vision.clear();
+
     bool cast_left = !left_edges.contains(index);
     bool cast_right = !right_edges.contains(index);
     bool cast_up = !top_edges.contains(index);
@@ -95,6 +148,8 @@ void calculate_rook_vision(Piece& self, int index) {
 }
 
 void calculate_bishop_vision(Piece& self, int index) { 
+    self.vision.clear();
+
     bool on_left_edge = left_edges.contains(index);
     bool on_right_edge = right_edges.contains(index);
     bool on_top_edge = top_edges.contains(index);
@@ -146,15 +201,25 @@ void calculate_bishop_vision(Piece& self, int index) {
 }
 
 void calculate_horsy_vision(Piece& self, int index) { 
+    self.vision.clear();
     
+    // TODO figure out how horses move.
 }
 
 void calculate_queen_vision(Piece& self, int index) { 
+    self.vision.clear();
+    std::vector<int> bishop_vision; 
+    
     calculate_bishop_vision(self, index);
+    bishop_vision.insert(bishop_vision.end(), self.vision.begin(), self.vision.end());
+    
     calculate_rook_vision(self, index);
+    self.vision.insert(self.vision.end(), bishop_vision.begin(), bishop_vision.end());
 }
 
 void calculate_king_vision(Piece& self, int index) { 
+    self.vision.clear();
+
     bool on_left_edge = left_edges.contains(index);
     bool on_right_edge = right_edges.contains(index);
     bool on_top_edge = top_edges.contains(index);
@@ -169,5 +234,4 @@ void calculate_king_vision(Piece& self, int index) {
     if (!on_left_edge && !on_bottom_edge) self.vision.push_back(index + 7);
     if (!on_right_edge && !on_top_edge) self.vision.push_back(index - 7);
     if (!on_right_edge && !on_bottom_edge) self.vision.push_back(index + 9);
-
 }

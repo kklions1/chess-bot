@@ -133,10 +133,11 @@ void gui_main(Board& board) {
                 }
                 case sf::Event::MouseButtonPressed: { 
                     sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
-                    auto sprite_ptr = get_piece_at_position(mouse_pos, pieces);
                     move_target_starting_index = calculate_index(mouse_pos);
+                    auto sprite_ptr = get_piece_at_position(mouse_pos, pieces);
                     drag_target = sprite_ptr; 
                     vision_target = sprite_ptr; 
+                    
                     legal_move_indicator.clear();
                     show_moves_for_piece(vision_target, legal_move_indicator);
                     is_dragging = true;
@@ -145,7 +146,7 @@ void gui_main(Board& board) {
                 case sf::Event::MouseButtonReleased: { 
                     sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
                     snap_piece_to_square(mouse_pos, drag_target);
-                    board.move_piece(move_target_starting_index, calculate_index(mouse_pos));
+                    board.move_piece(move_target_starting_index, calculate_index(drag_target->shape.getPosition()));
                     is_dragging = false;
                     drag_target = nullptr;
                     break;

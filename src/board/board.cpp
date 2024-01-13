@@ -11,6 +11,8 @@ Board::Board() :
     }
 
 void Board::move_piece(int start, int target) { 
+    if (start == target) return; // The piece didnt move.
+
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
 
@@ -20,11 +22,12 @@ void Board::move_piece(int start, int target) {
         this->board[start] = temp; 
 
         move_target->calc_vision(*move_target, target);
+        std::cout << "calculating vision for Piece: " << move_target->name() << std::endl; 
     }
 
-    if (destination_target->color() != move_target->color()) { 
+    // if (destination_target->color() != move_target->color()) { 
         
-    }
+    // }
 }
 
 void no_vision(Piece& self, int index) { 

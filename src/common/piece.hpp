@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <set>
+#include <string> 
 
 extern int piece_mask;
 extern int color_mask;
@@ -32,6 +33,8 @@ typedef struct Piece {
 
     int color();
     int type();
+
+    std::string name(); 
 
     Piece(): data(PieceType::EMPTY), vision(std::vector<int>()), calc_vision([](Piece& self, int index) { /* no-op */ }) {}
 } Piece; 

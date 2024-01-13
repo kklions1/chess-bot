@@ -31,17 +31,17 @@ sf::Vector2f calculate_position(int index) {
 
 // Calculates the index in the board for a sprite based on its position 
 int calculate_index(const sf::Vector2i& pos) { 
-    int x = pos.x / 100; 
-    int y = pos.y / 100; 
+    int x = (pos.x / 100); 
+    int y = (pos.y / 100); 
 
-    return (x * 8) + y; 
+    return (y * 8) + x; 
 }
 
 int calculate_index(const sf::Vector2f& pos) { 
-    int x = pos.x / 100; 
-    int y = pos.y / 100; 
+    int x = (pos.x / 100); 
+    int y = (pos.y / 100); 
 
-    return (x * 8) + y; 
+    return (y * 8) + x; 
 }
 
 PieceSprite_ptr get_piece_at_position(const sf::Vector2i& click_pos, std::vector<PieceSprite_ptr>& sprites) {
