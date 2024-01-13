@@ -16,6 +16,8 @@ void Board::move_piece(int start, int target) {
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
 
+    if (!move_target->vision.contains(target)) return; // invalid move
+
     if (destination_target->data == PieceType::EMPTY) { 
         Piece_ptr temp = destination_target;
         this->board[target] = move_target;
@@ -32,6 +34,10 @@ void Board::move_piece(int start, int target) {
 
 void Board::prune_illegal_moves(Piece_ptr piece, int piece_index) { 
 
+}
+
+void Board::generate_legal_moves(Piece_ptr piece, int index) { 
+    
 }
 
 void no_vision(Piece& self, int index) { 

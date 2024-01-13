@@ -82,14 +82,14 @@ void calculate_pawn_vision(Piece& self, int index) {
     }
 
     if (!left_edges.contains(advance)) { 
-        self.vision.push_back(left);
+        self.vision.insert(left);
     }
 
     if (!right_edges.contains(advance)) { 
-        self.vision.push_back(right);
+        self.vision.insert(right);
     }
 
-    self.vision.push_back(advance);
+    self.vision.insert(advance);
 }
 
 void calculate_rook_vision(Piece& self, int index) { 
@@ -103,41 +103,41 @@ void calculate_rook_vision(Piece& self, int index) {
     int left_current = index - 1;
     if (cast_left) {
         while (!left_edges.contains(left_current)) { 
-            self.vision.push_back(left_current); 
+            self.vision.insert(left_current); 
             left_current -= 1;
         }
 
-        self.vision.push_back(left_current);
+        self.vision.insert(left_current);
     }
 
     int right_current = index + 1;
     if (cast_right) {
         while (!right_edges.contains(right_current)) { 
-            self.vision.push_back(right_current); 
+            self.vision.insert(right_current); 
             right_current += 1;
         }
 
-        self.vision.push_back(right_current);
+        self.vision.insert(right_current);
     }
 
     int up_current = index - 8;
     if (cast_up) {
         while (!top_edges.contains(up_current)) { 
-            self.vision.push_back(up_current); 
+            self.vision.insert(up_current); 
             up_current -= 8;
         }
 
-        self.vision.push_back(up_current);
+        self.vision.insert(up_current);
     }
 
     int down_current = index + 8;
     if (cast_down) {
         while (!bottom_edges.contains(down_current)) { 
-            self.vision.push_back(down_current); 
+            self.vision.insert(down_current); 
             down_current += 8;
         }
 
-        self.vision.push_back(down_current);
+        self.vision.insert(down_current);
     }
 }
 
@@ -151,46 +151,46 @@ void calculate_bishop_vision(Piece& self, int index) {
 
     // cast ray up-left
     if (!on_left_edge && !on_top_edge) { 
-        int current = index - 9; 
+        int current = index + Direction::NORTH_WEST; 
         while (!left_edges.contains(current) && !top_edges.contains(current)) { 
-            self.vision.push_back(current);
-            current -= 9;
+            self.vision.insert(current);
+            current += Direction::NORTH_WEST;
         }
 
-        self.vision.push_back(current);
+        self.vision.insert(current);
     }
 
     // cast ray up-right
     if (!on_right_edge && !on_top_edge) { 
-        int current = index - 7; 
+        int current = index + Direction::NORTH_EAST; 
         while (!right_edges.contains(current) && !top_edges.contains(current)) { 
-            self.vision.push_back(current);
-            current -= 7;
+            self.vision.insert(current);
+            current += Direction::NORTH_EAST;
         }
 
-        self.vision.push_back(current);
+        self.vision.insert(current);
     }
 
     // cast ray down-left
     if (!on_left_edge && !on_bottom_edge) { 
         int current = index + 7; 
         while (!left_edges.contains(current) && !bottom_edges.contains(current)) { 
-            self.vision.push_back(current);
+            self.vision.insert(current);
             current += 7;
         }
 
-        self.vision.push_back(current);
+        self.vision.insert(current);
     }
 
     // cast ray down-right
     if (!on_right_edge && !on_bottom_edge) { 
         int current = index + 9; 
         while (!right_edges.contains(current) && !bottom_edges.contains(current)) { 
-            self.vision.push_back(current);
+            self.vision.insert(current);
             current += 9;
         }
 
-        self.vision.push_back(current);
+        self.vision.insert(current);
     }
 }
 
@@ -202,13 +202,13 @@ void calculate_horsy_vision(Piece& self, int index) {
 
 void calculate_queen_vision(Piece& self, int index) { 
     self.vision.clear();
-    std::vector<int> bishop_vision; 
+    std::set<int> bishop_vision; 
     
     calculate_bishop_vision(self, index);
-    bishop_vision.insert(bishop_vision.end(), self.vision.begin(), self.vision.end());
+    bishop_vision.merge(self.vision);
     
     calculate_rook_vision(self, index);
-    self.vision.insert(self.vision.end(), bishop_vision.begin(), bishop_vision.end());
+    self.vision.merge(bishop_vision);
 }
 
 void calculate_king_vision(Piece& self, int index) { 
@@ -219,13 +219,13 @@ void calculate_king_vision(Piece& self, int index) {
     bool on_top_edge = top_edges.contains(index);
     bool on_bottom_edge = bottom_edges.contains(index);
 
-    if (!on_left_edge) self.vision.push_back(index - 1);
-    if (!on_right_edge) self.vision.push_back(index + 1);
-    if (!on_bottom_edge) self.vision.push_back(index + 8);
-    if (!on_top_edge) self.vision.push_back(index - 8);
+    if (!on_left_edge) self.vision.insert(index - 1);
+    if (!on_right_edge) self.vision.insert(index + 1);
+    if (!on_bottom_edge) self.vision.insert(index + 8);
+    if (!on_top_edge) self.vision.insert(index - 8);
 
-    if (!on_left_edge && !on_top_edge) self.vision.push_back(index - 9);
-    if (!on_left_edge && !on_bottom_edge) self.vision.push_back(index + 7);
-    if (!on_right_edge && !on_top_edge) self.vision.push_back(index - 7);
-    if (!on_right_edge && !on_bottom_edge) self.vision.push_back(index + 9);
+    if (!on_left_edge && !on_top_edge) self.vision.insert(index - 9);
+    if (!on_left_edge && !on_bottom_edge) self.vision.insert(index + 7);
+    if (!on_right_edge && !on_top_edge) self.vision.insert(index - 7);
+    if (!on_right_edge && !on_bottom_edge) self.vision.insert(index + 9);
 }

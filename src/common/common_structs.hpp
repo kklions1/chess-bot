@@ -21,6 +21,7 @@ typedef struct Board {
 
     void move_piece(int, int);
     void prune_illegal_moves(Piece_ptr, int);
+    void generate_legal_moves(Piece_ptr, int);
 
     Board();
 } Board; 

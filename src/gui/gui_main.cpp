@@ -102,7 +102,7 @@ void debug_print_vector(const sf::Vector2f& vec) {
 void show_moves_for_piece(PieceSprite_ptr vision_target, std::vector<sf::CircleShape>& legal_move_indicatior) { 
     if (vision_target == nullptr) return;
 
-    std::vector<int> vision = vision_target->piece->vision; 
+    std::set<int> vision = vision_target->piece->vision; 
     for (int i : vision) { 
         sf::Vector2f position = calculate_position(i);
         sf::CircleShape indicator(50.0f);
