@@ -17,6 +17,29 @@ bool is_edge_index(int i) {
     return left_edges.contains(i) || right_edges.contains(i) || top_edges.contains(i) || bottom_edges.contains(i);
 }
 
+bool is_edge_in_direction(int i, int direction) { 
+    switch (direction) { 
+        case Direction::NORTH: 
+            return top_edges.contains(i);
+        case Direction::SOUTH: 
+            return bottom_edges.contains(i);
+        case Direction::EAST: 
+            return right_edges.contains(i);
+        case Direction::WEST: 
+            return left_edges.contains(i);
+        case Direction::NORTH_EAST: 
+            return top_edges.contains(i) || right_edges.contains(i);
+        case Direction::NORTH_WEST: 
+            return top_edges.contains(i) || left_edges.contains(i);
+        case Direction::SOUTH_EAST: 
+            return bottom_edges.contains(i) || right_edges.contains(i);
+        case Direction::SOUTH_WEST: 
+            return bottom_edges.contains(i) || left_edges.contains(i);
+        default:
+            return is_edge_index(i);
+    }
+}
+
 int Piece::color() { 
     return color_mask & this->data;
 }

@@ -21,9 +21,19 @@ typedef struct Board {
 
     void move_piece(int, int);
     void prune_illegal_moves(Piece_ptr, int);
+    void cast_ray(Piece_ptr, int, int);
+    
+    // Pseudo-legal moves to start. 
     void generate_legal_moves(Piece_ptr, int);
 
     Board();
+
+    void pawn_moves(Piece_ptr, int);
+    void rook_moves(Piece_ptr, int);
+    void bishop_moves(Piece_ptr, int);
+    void horsy_moves(Piece_ptr, int);
+    void queen_moves(Piece_ptr, int);
+    void king_vision(Piece_ptr, int);
 } Board; 
 
 typedef struct Move { 

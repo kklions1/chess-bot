@@ -18,7 +18,7 @@ typedef struct Piece {
     int data; 
     std::set<int> vision; 
 
-    void (*calc_vision)(Piece&, int); 
+    void (*calc_vision)(Piece&,  int); 
 
     int color();
     int type();
@@ -29,6 +29,9 @@ typedef struct Piece {
 } Piece; 
 
 typedef std::shared_ptr<Piece> Piece_ptr;
+
+bool is_edge_index(int);
+bool is_edge_in_direction(int, int);
 
 void calculate_pawn_vision(Piece&, int);
 void calculate_rook_vision(Piece&, int);

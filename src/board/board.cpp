@@ -21,9 +21,9 @@ void Board::move_piece(int start, int target) {
     if (destination_target->data == PieceType::EMPTY) { 
         Piece_ptr temp = destination_target;
         this->board[target] = move_target;
-        this->board[start] = temp; 
+        this->board[start] = temp;
 
-        move_target->calc_vision(*move_target, target);
+        generate_legal_moves(move_target, target);
         std::cout << "calculating vision for Piece: " << move_target->name() << std::endl; 
     }
 
@@ -37,8 +37,121 @@ void Board::prune_illegal_moves(Piece_ptr piece, int piece_index) {
 }
 
 void Board::generate_legal_moves(Piece_ptr piece, int index) { 
-    
+    switch (piece->type()) { 
+        case PieceType::ROOK: 
+            rook_moves(piece, index);
+            break;
+        case PieceType::BISHOP: 
+            bishop_moves(piece, index);
+            break;
+        case PieceType::PAWN:
+            pawn_moves(piece, index);
+            break;
+        case PieceType::KNIGHT: 
+            horsy_moves(piece, index);
+            break;
+        case PieceType::QUEEN:
+            queen_moves(piece, index); 
+            break;
+        case PieceType::KING: 
+            king_vision(piece, index);
+            break;
+        default: 
+            break;
+    }
 }
+
+void Board::pawn_moves(Piece_ptr piece, int index) { 
+
+}
+
+void Board::cast_ray(Piece_ptr piece, int start, int direction) { 
+    int current = start + direction;
+    
+    while (true) { 
+        Piece_ptr target = this->board[current];
+        std::cout << "current: " << current << std::endl;
+        
+        if (target->data == PieceType::EMPTY) { // Empty square
+            piece->vision.insert(current);
+            if (is_edge_in_direction(current, direction)) break; 
+            current += direction;
+            continue;
+        }
+        
+        if (target->color() != piece->color()) { // Capture
+            piece->vision.insert(current);
+            break; // Last valid move in this direction
+        }
+
+        if (target->color() == piece->color()) { 
+            break; // Friendly piece blocking our path. not a valid move.
+        }
+    }
+}
+
+void Board::rook_moves(Piece_ptr piece, int index) { 
+    piece->vision.clear();
+
+    bool cast_west = !left_edges.contains(index);
+    bool cast_east = !right_edges.contains(index);
+    bool cast_north = !top_edges.contains(index);
+    bool cast_south = !bottom_edges.contains(index);
+
+    if (cast_west) {
+        cast_ray(piece, index, Direction::WEST);
+    }
+
+    if (cast_east) {
+        cast_ray(piece, index, Direction::EAST);
+    }
+
+    if (cast_south) {
+        cast_ray(piece, index, Direction::SOUTH);
+    }
+
+    if (cast_north) {
+        cast_ray(piece, index, Direction::NORTH);
+    }
+}
+
+void Board::bishop_moves(Piece_ptr piece, int index) { 
+    piece->vision.clear();
+
+    bool on_left_edge = left_edges.contains(index);
+    bool on_right_edge = right_edges.contains(index);
+    bool on_top_edge = top_edges.contains(index);
+    bool on_bottom_edge = bottom_edges.contains(index);
+
+    // cast ray up-left
+    if (!on_left_edge && !on_top_edge) cast_ray(piece, index, Direction::NORTH_WEST);
+
+    // cast ray up-right
+    if (!on_right_edge && !on_top_edge) cast_ray(piece, index, Direction::NORTH_EAST);
+
+    // cast ray down-left
+    if (!on_left_edge && !on_bottom_edge) cast_ray(piece, index, Direction::SOUTH_WEST);
+
+    // cast ray down-right
+    if (!on_right_edge && !on_bottom_edge) cast_ray(piece, index, Direction::SOUTH_EAST);
+}
+
+void Board::horsy_moves(Piece_ptr piece, int index) { 
+
+}
+
+void Board::queen_moves(Piece_ptr piece, int index) { 
+    rook_moves(piece, index);
+    auto temp_moves = piece->vision; 
+    bishop_moves(piece, index);
+    piece->vision.merge(temp_moves);
+}   
+
+void Board::king_vision(Piece_ptr piece, int index) { 
+
+}
+
+
 
 void no_vision(Piece& self, int index) { 
     /* no-op */ 
@@ -400,8 +513,8 @@ void update_all_vision(Board& self) {
 
         if (current == nullptr) continue;
         if (current->data == PieceType::EMPTY) continue;
-        if (current->calc_vision == nullptr) continue;
         
-        current->calc_vision(*current, i);
+        // current->calc_vision(*current, i);
+        self.generate_legal_moves(current, i);
     }
 }
