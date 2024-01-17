@@ -32,10 +32,3 @@ typedef std::shared_ptr<Piece> Piece_ptr;
 
 bool is_edge_index(int);
 bool is_edge_in_direction(int, int);
-
-void calculate_pawn_vision(Piece&, int);
-void calculate_rook_vision(Piece&, int);
-void calculate_bishop_vision(Piece&, int);
-void calculate_horsy_vision(Piece&, int);
-void calculate_queen_vision(Piece&, int);
-void calculate_king_vision(Piece&, int);
