@@ -62,7 +62,47 @@ void Board::generate_legal_moves(Piece_ptr piece, int index) {
 }
 
 void Board::pawn_moves(Piece_ptr piece, int index) { 
+    std::set<int> white_starting_rank = {48, 49, 50, 51, 52, 53, 54, 55};
+    std::set<int> black_starting_rank = {8, 9, 10, 11, 12, 13, 14, 15}; 
+    piece->vision.clear();
+    int left, right, advance, advance_twice; 
+    bool on_starting_rank;
 
+    if (piece->color() == PieceType::WHITE) { 
+        left = index + Direction::NORTH_WEST;
+        right = index + Direction::NORTH_EAST;
+        advance = index + Direction::NORTH;
+        advance_twice = advance + Direction::NORTH;
+        on_starting_rank = white_starting_rank.contains(index);
+    } else { // Black piece 
+        right = index + Direction::SOUTH_EAST;
+        left = index + Direction::SOUTH_WEST;
+        advance = index + Direction::SOUTH;
+        advance_twice = advance + Direction::SOUTH;
+        on_starting_rank = black_starting_rank.contains(index);
+    }
+
+    if (this->board[advance]->data == PieceType::EMPTY) piece->vision.insert(advance);
+    if (on_starting_rank && this->board[advance_twice]->data == PieceType::EMPTY) piece->vision.insert(advance_twice);
+    
+    Piece_ptr left_target = this->board[left];
+    Piece_ptr right_target = this->board[right];
+    
+    if (
+        ((left_target->data != PieceType::EMPTY
+        && left_target->color() != piece->color()) 
+        || (left_target->data == PieceType::EMPTY
+            && left == this->en_passant_target))
+        && !left_edges.contains(advance)
+    ) piece->vision.insert(left);
+
+    if (
+        ((right_target->data != PieceType::EMPTY
+        && right_target->color() != piece->color()) 
+        || (right_target->data == PieceType::EMPTY
+            && right == this->en_passant_target))
+        && !right_edges.contains(advance)
+    ) piece->vision.insert(right);
 }
 
 void Board::cast_ray(Piece_ptr piece, int start, int direction) { 
@@ -148,7 +188,68 @@ void Board::queen_moves(Piece_ptr piece, int index) {
 }   
 
 void Board::king_vision(Piece_ptr piece, int index) { 
+    piece->vision.clear();
 
+    bool on_left_edge = left_edges.contains(index);
+    bool on_right_edge = right_edges.contains(index);
+    bool on_top_edge = top_edges.contains(index);
+    bool on_bottom_edge = bottom_edges.contains(index);
+
+    if (!on_left_edge) { 
+        int w_target = index + Direction::WEST; 
+        if (this->board[w_target]->data == PieceType::EMPTY || this->board[w_target]->color() != piece->color()) { 
+            piece->vision.insert(w_target);
+        }
+    } 
+
+    if (!on_right_edge) { 
+        int e_target = index + Direction::EAST; 
+        if (this->board[e_target]->data == PieceType::EMPTY || this->board[e_target]->color() != piece->color()) { 
+            piece->vision.insert(e_target);
+        }
+    }
+
+    if (!on_bottom_edge) { 
+        int s_target = index + Direction::SOUTH; 
+        if (this->board[s_target]->data == PieceType::EMPTY || this->board[s_target]->color() != piece->color()) { 
+            piece->vision.insert(s_target);
+        }
+    }
+
+    if (!on_top_edge) { 
+        int n_target = index + Direction::NORTH; 
+        if (this->board[n_target]->data == PieceType::EMPTY || this->board[n_target]->color() != piece->color()) { 
+            piece->vision.insert(n_target);
+        }
+    }
+    
+    if (!on_left_edge && !on_top_edge) { 
+        int nw_target = index + Direction::NORTH_WEST; 
+        if (this->board[nw_target]->data == PieceType::EMPTY || this->board[nw_target]->color() != piece->color()) { 
+            piece->vision.insert(nw_target);
+        }
+    }
+
+    if (!on_left_edge && !on_bottom_edge) { 
+        int sw_target = index + Direction::SOUTH_WEST; 
+        if (this->board[sw_target]->data == PieceType::EMPTY || this->board[sw_target]->color() != piece->color()) { 
+            piece->vision.insert(sw_target);
+        }
+    }
+
+    if (!on_right_edge && !on_top_edge) { 
+        int ne_target = index + Direction::NORTH_EAST; 
+        if (this->board[ne_target]->data == PieceType::EMPTY || this->board[ne_target]->color() != piece->color()) { 
+            piece->vision.insert(ne_target);
+        }
+    }
+
+    if (!on_right_edge && !on_bottom_edge) { 
+        int sw_target = index + Direction::SOUTH_WEST; 
+        if (this->board[sw_target]->data == PieceType::EMPTY || this->board[sw_target]->color() != piece->color()) { 
+            piece->vision.insert(sw_target);
+        }
+    }
 }
 
 
