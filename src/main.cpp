@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     
     auto game_board = std::make_unique<Board>();
     parse_fen_string(starting_fen, *game_board);
-    update_all_vision(*game_board);
+    game_board->generate_legal_moves();
 
     print_index();
    

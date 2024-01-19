@@ -121,6 +121,7 @@ void gui_main(Board& board) {
     PieceSprite_ptr drag_target;
     PieceSprite_ptr vision_target;
     int move_target_starting_index;
+    int move_target_index;
     bool is_dragging = false;
 
     while (main_window.isOpen()) {
@@ -148,8 +149,30 @@ void gui_main(Board& board) {
                     if (drag_target == nullptr) break;
 
                     sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
-                    snap_piece_to_square(mouse_pos, drag_target);
-                    board.move_piece(move_target_starting_index, calculate_index(drag_target->shape.getPosition()));
+                    switch (board.move_piece(move_target_starting_index, move_target_index = calculate_index(mouse_pos))) { 
+                        case MoveResult::NO_MOVE: { 
+                            std::cout << "Invalid move\n";
+                            drag_target->setPosition(calculate_position(move_target_starting_index));
+                            move_target_index = -1; 
+                            move_target_starting_index = -1;
+                            break;
+                        }
+                        case MoveResult::MOVE: { 
+                            std::cout << "Standard move\n";
+                            drag_target->setPosition(mouse_pos);
+                            break;
+                        }
+                        case MoveResult::CAPTURE: { 
+                            std::cout << "Capture\n";
+                            auto capture_target = get_sprite_at_board_index(move_target_index, pieces); 
+                            (*capture_target)->hide();
+                            if (capture_target != pieces.end()) pieces.erase(capture_target);
+                            std::cout << "captured " << (*capture_target)->piece->name() << std::endl;
+                            drag_target->setPosition(mouse_pos);
+                            
+                            break;
+                        }
+                    }
                     drag_target = nullptr;
                     // TODO Board::move_piece should return bool. check here for completed move. if completed, reset vision display
                     break;

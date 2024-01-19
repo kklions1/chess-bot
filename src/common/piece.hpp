@@ -18,14 +18,12 @@ typedef struct Piece {
     int data; 
     std::set<int> vision; 
 
-    void (*calc_vision)(Piece&,  int); 
-
     int color();
     int type();
 
     std::string name(); 
 
-    Piece(): data(PieceType::EMPTY), vision(std::set<int>()), calc_vision([](Piece& self, int index) { /* no-op */ }) {}
+    Piece(): data(PieceType::EMPTY), vision(std::set<int>()) {}
 } Piece; 
 
 typedef std::shared_ptr<Piece> Piece_ptr;

@@ -19,12 +19,12 @@ typedef struct Board {
 
     int active_color;
 
-    void move_piece(int, int);
+    MoveResult move_piece(int, int);
     void prune_illegal_moves(Piece_ptr, int);
     void cast_ray(Piece_ptr, int, int);
     
     // Pseudo-legal moves to start. 
-    void generate_legal_moves(Piece_ptr, int);
+    void generate_legal_moves();
 
     Board();
 

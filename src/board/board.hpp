@@ -12,7 +12,4 @@ void parse_fen_string(std::string, Board&);
 std::string generate_fen_string(const Board&);
 int get_board_index(const char*);
 std::vector<std::string> split(std::string, const char);
-bool is_color(int, int);
-int piece_type(int);
 void print_index(); 
-void update_all_vision(Board&);

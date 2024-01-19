@@ -13,6 +13,9 @@ typedef struct PieceSprite {
     Piece_ptr piece;
 
     PieceSprite(std::shared_ptr<sf::Texture>, Piece_ptr); 
+
+    void setPosition(const sf::Vector2f&);
+    void hide(); 
 } PieceSprite; 
 
 typedef std::shared_ptr<PieceSprite> PieceSprite_ptr; 
@@ -21,5 +24,6 @@ sf::Vector2f calculate_position(int);
 int calculate_index(const sf::Vector2i&);
 int calculate_index(const sf::Vector2f&);
 PieceSprite_ptr get_piece_at_position(const sf::Vector2i&, std::vector<PieceSprite_ptr>&);
+std::vector<PieceSprite_ptr>::iterator get_sprite_at_board_index(int, std::vector<PieceSprite_ptr>&);
 void snap_piece_to_square(const sf::Vector2f&, PieceSprite_ptr);
 std::vector<PieceSprite_ptr> init_sprites(Board&, const TextureMap&);

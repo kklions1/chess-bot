@@ -7,6 +7,19 @@ PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, Piece_ptr piece) 
     this->shape.setTexture(texture.get());
 }
 
+// snaps the piece to the nearest board square to the position. usually the mouse position
+void PieceSprite::setPosition(const sf::Vector2f& pos) { 
+    this->shape.setPosition(normalize_to_corner(pos));
+}
+
+void PieceSprite::hide() { 
+    this->shape.setFillColor(sf::Color(0));
+}
+
+// void PieceSprite::setPosition(const sf::Vector2i& pos) { 
+//     this->shape.setPosition(normalize_to_corner(pos));
+// }
+
 std::vector<PieceSprite_ptr> init_sprites(Board& board, const TextureMap& texture_map) {
     std::vector<PieceSprite_ptr> result;
     for (int i = 0; i < 64; ++i) { 
@@ -38,15 +51,16 @@ int calculate_index(const sf::Vector2i& pos) {
 }
 
 int calculate_index(const sf::Vector2f& pos) { 
+    // convert position into simple (x, y) coordinates 
     int x = (pos.x / 100); 
     int y = (pos.y / 100); 
 
     return (y * 8) + x; 
 }
 
-PieceSprite_ptr get_piece_at_position(const sf::Vector2i& click_pos, std::vector<PieceSprite_ptr>& sprites) {
+PieceSprite_ptr get_piece_at_position(const sf::Vector2i& pos, std::vector<PieceSprite_ptr>& sprites) {
     for (int i = 0; i < sprites.size(); ++i) { 
-        if (sprites[i]->shape.getGlobalBounds().contains(sf::Vector2f(click_pos))) { 
+        if (sprites[i]->shape.getGlobalBounds().contains(sf::Vector2f(pos))) { 
             return sprites[i]; 
         }
     }
@@ -54,8 +68,20 @@ PieceSprite_ptr get_piece_at_position(const sf::Vector2i& click_pos, std::vector
     return nullptr;
 }
 
+std::vector<PieceSprite_ptr>::iterator get_sprite_at_board_index(int index, std::vector<PieceSprite_ptr>& sprites) {
+    sf::Vector2f pos = calculate_position(index);
+    for (int i = 0; i < sprites.size(); ++i) { 
+        if (sprites[i]->shape.getGlobalBounds().contains(sf::Vector2f(pos))) { 
+            return sprites.begin() + i; 
+        }
+    }
+
+    return sprites.end();
+}
+
 void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite_ptr sprite) { 
     if (sprite == nullptr) return;
 
-    sprite->shape.setPosition(normalize_to_corner(mouse_pos));
+    sprite->setPosition(mouse_pos);
 }
+

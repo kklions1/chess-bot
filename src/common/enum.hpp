@@ -23,3 +23,9 @@ typedef enum Direction {
     SOUTH_EAST = 9, 
     SOUTH_WEST = 7
 } Direction;
+
+typedef enum MoveResult { 
+    NO_MOVE, 
+    MOVE,
+    CAPTURE 
+} MoveResult; 

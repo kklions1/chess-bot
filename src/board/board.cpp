@@ -10,54 +10,65 @@ Board::Board() :
         }
     }
 
-void Board::move_piece(int start, int target) { 
-    if (start == target) return; // The piece didnt move.
+MoveResult Board::move_piece(int start, int target) { 
+    if (start == target) return MoveResult::NO_MOVE; // The piece didnt move.
+    if (start == -1 || target == -1) return MoveResult::NO_MOVE; 
 
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
 
-    if (!move_target->vision.contains(target)) return; // invalid move
+    if (!move_target->vision.contains(target)) return MoveResult::NO_MOVE; // invalid move
 
     if (destination_target->data == PieceType::EMPTY) { 
         Piece_ptr temp = destination_target;
         this->board[target] = move_target;
         this->board[start] = temp;
 
-        generate_legal_moves(move_target, target);
-        std::cout << "calculating vision for Piece: " << move_target->name() << std::endl; 
+        generate_legal_moves();
+        return MoveResult::MOVE;
     }
 
-    // if (destination_target->color() != move_target->color()) { 
-        
-    // }
+    if (destination_target->color() != move_target->color()) { 
+        this->board[target] = move_target; 
+        this->board[start] = std::make_shared<Piece>();
+
+        generate_legal_moves();
+
+        return MoveResult::CAPTURE; 
+    }
+
+    return MoveResult::NO_MOVE;
 }
 
 void Board::prune_illegal_moves(Piece_ptr piece, int piece_index) { 
 
 }
 
-void Board::generate_legal_moves(Piece_ptr piece, int index) { 
-    switch (piece->type()) { 
-        case PieceType::ROOK: 
-            rook_moves(piece, index);
-            break;
-        case PieceType::BISHOP: 
-            bishop_moves(piece, index);
-            break;
-        case PieceType::PAWN:
-            pawn_moves(piece, index);
-            break;
-        case PieceType::KNIGHT: 
-            horsy_moves(piece, index);
-            break;
-        case PieceType::QUEEN:
-            queen_moves(piece, index); 
-            break;
-        case PieceType::KING: 
-            king_vision(piece, index);
-            break;
-        default: 
-            break;
+void Board::generate_legal_moves() { 
+    for (int i = 0; i < 64; ++i) { 
+        Piece_ptr piece = this->board[i];
+        switch (piece->type()) { 
+            case PieceType::ROOK: 
+                rook_moves(piece, i);
+                break;
+            case PieceType::BISHOP: 
+                bishop_moves(piece, i);
+                break;
+            case PieceType::PAWN:
+                pawn_moves(piece, i);
+                break;
+            case PieceType::KNIGHT: 
+                horsy_moves(piece, i);
+                break;
+            case PieceType::QUEEN:
+                queen_moves(piece, i); 
+                break;
+            case PieceType::KING: 
+                king_vision(piece, i);
+                break;
+            default: 
+                break;
+        }
     }
 }
 
@@ -110,7 +121,6 @@ void Board::cast_ray(Piece_ptr piece, int start, int direction) {
     
     while (true) { 
         Piece_ptr target = this->board[current];
-        std::cout << "current: " << current << std::endl;
         
         if (target->data == PieceType::EMPTY) { // Empty square
             piece->vision.insert(current);
@@ -344,62 +354,50 @@ void parse_piece_locations(const std::string& fen, Board& board) {
             switch (*it) { 
                 case 'p':
                     current_piece->data = PieceType::BLACK | PieceType::PAWN; 
-                    current_piece->calc_vision = calculate_pawn_vision; 
                     index++;
                     break; 
                 case 'P': 
                     current_piece->data = PieceType::WHITE | PieceType::PAWN;
-                    current_piece->calc_vision = calculate_pawn_vision; 
                     index++;
                     break;
                 case 'n': 
                     current_piece->data = PieceType::BLACK | PieceType::KNIGHT;
-                    current_piece->calc_vision = calculate_horsy_vision; 
                     index++;
                     break;
                 case 'N': 
                     current_piece->data = PieceType::WHITE | PieceType::KNIGHT; 
-                    current_piece->calc_vision = calculate_horsy_vision;
                     index++;
                     break; 
                 case 'b': 
                     current_piece->data = PieceType::BLACK | PieceType::BISHOP;
-                    current_piece->calc_vision = calculate_bishop_vision;
                     index++;
                     break;
                 case 'B': 
                     current_piece->data = PieceType::WHITE | PieceType::BISHOP;
-                    current_piece->calc_vision = calculate_bishop_vision;
                     index++;
                     break;
                 case 'r': 
                     current_piece->data = PieceType::BLACK | PieceType::ROOK;
-                    current_piece->calc_vision = calculate_rook_vision;
                     index++;
                     break;
                 case 'R': 
                     current_piece->data = PieceType::WHITE | PieceType::ROOK;
-                    current_piece->calc_vision = calculate_rook_vision;
                     index++;
                     break;
                 case 'q':
                     current_piece->data = PieceType::BLACK | PieceType::QUEEN;
-                    current_piece->calc_vision = calculate_queen_vision;
                     index++;
                     break;
                 case 'Q': 
                     current_piece->data = PieceType::WHITE | PieceType::QUEEN;
-                    current_piece->calc_vision = calculate_queen_vision;
                     index++;
                     break;
                 case 'k':
                     current_piece->data = PieceType::BLACK | PieceType::KING;
-                    current_piece->calc_vision = calculate_king_vision;
                     index++;
                     break;
                 case 'K':
                     current_piece->data = PieceType::WHITE | PieceType::KING;
-                    current_piece->calc_vision = calculate_king_vision;
                     index++;
                     break;
                 case '/': 
@@ -588,14 +586,6 @@ int get_board_index(const char* square) {
     return (rank_offset * 8) + file_offset;
 }
 
-bool is_color(int piece, int color_mask) { 
-    return (piece & color_mask) == color_mask;
-}
-
-int piece_type(int piece) {
-    return piece & 0b00111;
-}
-
 void print_index() {
   int counter = 0; 
   for (int i = 0; i < 64; ++i) {
@@ -606,16 +596,4 @@ void print_index() {
     std::cout << i << " ";
     counter++;
   }
-}
-
-void update_all_vision(Board& self) { 
-    for (int i = 0; i < 64; ++i) { 
-        auto current = self.board[i];
-
-        if (current == nullptr) continue;
-        if (current->data == PieceType::EMPTY) continue;
-        
-        // current->calc_vision(*current, i);
-        self.generate_legal_moves(current, i);
-    }
 }
