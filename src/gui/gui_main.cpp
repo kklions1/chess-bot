@@ -137,7 +137,7 @@ void gui_main(Board& board) {
                     move_target_starting_index = calculate_index(mouse_pos);
                     auto sprite_ptr = get_piece_at_position(mouse_pos, pieces);
                     drag_target = sprite_ptr; 
-                    vision_target = sprite_ptr; 
+                    vision_target = sprite_ptr;
                     
                     legal_move_indicator.clear();
                     show_moves_for_piece(vision_target, legal_move_indicator);
@@ -149,32 +149,31 @@ void gui_main(Board& board) {
                     if (drag_target == nullptr) break;
 
                     sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
+                    
                     switch (board.move_piece(move_target_starting_index, move_target_index = calculate_index(mouse_pos))) { 
                         case MoveResult::NO_MOVE: { 
-                            std::cout << "Invalid move\n";
+                            // Nothing happened, piece should go back to where it came from
                             drag_target->setPosition(calculate_position(move_target_starting_index));
-                            move_target_index = -1; 
-                            move_target_starting_index = -1;
                             break;
                         }
                         case MoveResult::MOVE: { 
-                            std::cout << "Standard move\n";
-                            drag_target->setPosition(mouse_pos);
+                            // The piece moved. Snap it to the square that it should have moved to.
+                            // Might require some double checking. things are kinda buggy
+                            drag_target->setPosition(calculate_position(move_target_index));
+                            legal_move_indicator.clear();
                             break;
                         }
                         case MoveResult::CAPTURE: { 
-                            std::cout << "Capture\n";
                             auto capture_target = get_sprite_at_board_index(move_target_index, pieces); 
-                            (*capture_target)->hide();
+
                             if (capture_target != pieces.end()) pieces.erase(capture_target);
-                            std::cout << "captured " << (*capture_target)->piece->name() << std::endl;
+
                             drag_target->setPosition(mouse_pos);
-                            
+                            legal_move_indicator.clear();
                             break;
                         }
                     }
                     drag_target = nullptr;
-                    // TODO Board::move_piece should return bool. check here for completed move. if completed, reset vision display
                     break;
                 }
                 case sf::Event::KeyPressed: { 

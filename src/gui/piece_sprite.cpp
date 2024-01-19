@@ -70,8 +70,9 @@ PieceSprite_ptr get_piece_at_position(const sf::Vector2i& pos, std::vector<Piece
 
 std::vector<PieceSprite_ptr>::iterator get_sprite_at_board_index(int index, std::vector<PieceSprite_ptr>& sprites) {
     sf::Vector2f pos = calculate_position(index);
+
     for (int i = 0; i < sprites.size(); ++i) { 
-        if (sprites[i]->shape.getGlobalBounds().contains(sf::Vector2f(pos))) { 
+        if (sprites[i]->shape.getPosition() == sf::Vector2f(pos)) { 
             return sprites.begin() + i; 
         }
     }

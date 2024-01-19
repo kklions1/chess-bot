@@ -12,7 +12,6 @@ Board::Board() :
 
 MoveResult Board::move_piece(int start, int target) { 
     if (start == target) return MoveResult::NO_MOVE; // The piece didnt move.
-    if (start == -1 || target == -1) return MoveResult::NO_MOVE; 
 
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
