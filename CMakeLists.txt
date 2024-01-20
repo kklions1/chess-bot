@@ -11,8 +11,8 @@ add_executable(chess
     src/board/board.cpp
     src/gui/gui_main.cpp
     src/gui/piece_sprite.cpp
-    src/common/piece.cpp
-    src/board/engine.cpp
+    src/board/piece.cpp
+    src/engine/engine.cpp
 )
 
 # i have no idea how CMake finds these

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../common/common_structs.hpp"
+#include "../board/board.hpp"
 #include "piece_sprite.hpp" 
 
 extern sf::RenderWindow main_window; 

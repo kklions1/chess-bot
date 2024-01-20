@@ -5,10 +5,8 @@
 #include <algorithm>
 
 #include "gui/piece_sprite.hpp"
-#include "common/common_structs.hpp"
 #include "board/board.hpp"
 #include "gui/gui_main.hpp"
-#include "board/engine.hpp"
 
 int main(int argc, char** argv) {
     std::vector<std::string> program_args; 

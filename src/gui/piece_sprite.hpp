@@ -1,9 +1,13 @@
 #pragma once 
 
-#include "../common/common_structs.hpp"
+#include "../board/board.hpp"
+#include "../board/piece.hpp"
 #include "gui_main.hpp"
 
 #include <memory>
+#include <unordered_map>
+#include <vector>
+#include <SFML/Graphics.hpp>
 
 typedef std::unordered_map<int, std::shared_ptr<sf::Texture>> TextureMap; 
 
