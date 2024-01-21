@@ -9,6 +9,11 @@
 #include "piece.hpp" 
 #include "enum.hpp"
 
+extern std::set<int> left_edges; // A File 
+extern std::set<int> right_edges; // H File 
+extern std::set<int> top_edges; // 8th Rank
+extern std::set<int> bottom_edges; // 1st Rank
+
 typedef struct Board { 
     Piece_ptr board[64];
 
@@ -45,4 +50,7 @@ void parse_fen_string(std::string, Board&);
 std::string generate_fen_string(const Board&);
 int get_board_index(const char*);
 std::vector<std::string> split(std::string, const char);
-void print_index(); 
+void print_index();
+
+bool is_edge_index(int);
+bool is_edge_in_direction(int, int);

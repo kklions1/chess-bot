@@ -1,5 +1,14 @@
 #include "board.hpp" 
 
+std::set<int> edges = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 23, 24,
+     31, 32, 39, 40, 47, 48, 55, 56, 57, 58, 59, 60, 61, 62, 63 }; 
+
+std::set<int> left_edges = { 0, 8, 16, 24, 32, 40, 48, 56 };
+std::set<int> right_edges = { 7, 15, 23, 31, 39, 47, 55, 63 };
+std::set<int> top_edges = { 0, 1, 2, 3, 4, 5, 6, 7 };
+std::set<int> bottom_edges = { 56, 57, 58, 59, 60, 61, 62, 63 };
+
+
 Board::Board() :
     white_castle_short(false), white_castle_long(false),
     black_castle_short(false), black_castle_long(false), 
@@ -261,6 +270,26 @@ void Board::king_vision(Piece_ptr piece, int index) {
         int sw_target = index + Direction::SOUTH_WEST; 
         if (this->board[sw_target]->data == PieceType::EMPTY || this->board[sw_target]->color() != piece->color()) { 
             piece->vision.insert(sw_target);
+        }
+    }
+
+    int color = piece->color(); 
+
+    if (color == PieceType::WHITE) { 
+        if (this->white_castle_long) { 
+            piece->vision.insert(index + (2 * Direction::WEST));
+        }
+        if (this->white_castle_short) { 
+            piece->vision.insert(index + (2 * Direction::EAST));
+        }
+    }
+
+    if (color == PieceType::BLACK) { 
+        if (this->black_castle_long) { 
+            piece->vision.insert(index + (2 * Direction::WEST));
+        }
+        if (this->black_castle_short) { 
+            piece->vision.insert(index + (2 * Direction::EAST));
         }
     }
 }
@@ -599,4 +628,31 @@ void print_index() {
     std::cout << i << " ";
     counter++;
   }
+}
+
+bool is_edge_index(int i) { 
+    return left_edges.contains(i) || right_edges.contains(i) || top_edges.contains(i) || bottom_edges.contains(i);
+}
+
+bool is_edge_in_direction(int i, int direction) { 
+    switch (direction) { 
+        case Direction::NORTH: 
+            return top_edges.contains(i);
+        case Direction::SOUTH: 
+            return bottom_edges.contains(i);
+        case Direction::EAST: 
+            return right_edges.contains(i);
+        case Direction::WEST: 
+            return left_edges.contains(i);
+        case Direction::NORTH_EAST: 
+            return top_edges.contains(i) || right_edges.contains(i);
+        case Direction::NORTH_WEST: 
+            return top_edges.contains(i) || left_edges.contains(i);
+        case Direction::SOUTH_EAST: 
+            return bottom_edges.contains(i) || right_edges.contains(i);
+        case Direction::SOUTH_WEST: 
+            return bottom_edges.contains(i) || left_edges.contains(i);
+        default:
+            return is_edge_index(i);
+    }
 }
