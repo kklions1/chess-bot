@@ -92,8 +92,12 @@ void Board::pawn_moves(Piece_ptr piece, int index) {
         on_starting_rank = black_starting_rank.contains(index);
     }
 
-    if (this->board[advance]->data == PieceType::EMPTY) piece->vision.insert(advance);
-    if (on_starting_rank && this->board[advance_twice]->data == PieceType::EMPTY) piece->vision.insert(advance_twice);
+    if (this->board[advance]->data == PieceType::EMPTY) {
+        piece->vision.insert(advance); 
+    
+        if (on_starting_rank && this->board[advance_twice]->data == PieceType::EMPTY)
+            piece->vision.insert(advance_twice);
+    } 
     
     Piece_ptr left_target = this->board[left];
     Piece_ptr right_target = this->board[right];
