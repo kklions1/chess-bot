@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <string> 
+#include <memory>
 
 extern int piece_mask;
 extern int color_mask;
@@ -18,7 +19,13 @@ typedef struct Piece {
 
     std::string name(); 
 
-    Piece(): data(PieceType::EMPTY), vision(std::set<int>()) {}
+    static std::shared_ptr<Piece> make_empty(); 
+    static std::shared_ptr<Piece> make_white_pawn();
+
+    explicit Piece();
+
+private: 
+    explicit Piece(int);
 } Piece; 
 
 typedef std::shared_ptr<Piece> Piece_ptr;

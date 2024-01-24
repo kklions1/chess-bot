@@ -30,19 +30,19 @@ typedef struct Board {
 
     MoveResult move_piece(int, int);
     void prune_illegal_moves(Piece_ptr, int);
-    void cast_ray(Piece_ptr, int, int);
+    void cast_ray(Piece*, int, int);
     
     // Pseudo-legal moves to start. 
     void generate_legal_moves();
 
     Board();
 
-    void pawn_moves(Piece_ptr, int);
-    void rook_moves(Piece_ptr, int);
-    void bishop_moves(Piece_ptr, int);
-    void horsy_moves(Piece_ptr, int);
-    void queen_moves(Piece_ptr, int);
-    void king_vision(Piece_ptr, int);
+    void pawn_moves(Piece*, int);
+    void rook_moves(Piece*, int);
+    void bishop_moves(Piece*, int);
+    void horsy_moves(Piece*, int);
+    void queen_moves(Piece*, int);
+    void king_vision(Piece*, int);
 } Board; 
 
 void print_board(const Board&); 

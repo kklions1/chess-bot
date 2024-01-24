@@ -8,20 +8,20 @@ std::set<int> right_edges = { 7, 15, 23, 31, 39, 47, 55, 63 };
 std::set<int> top_edges = { 0, 1, 2, 3, 4, 5, 6, 7 };
 std::set<int> bottom_edges = { 56, 57, 58, 59, 60, 61, 62, 63 };
 
-
 Board::Board() :
     white_castle_short(false), white_castle_long(false),
     black_castle_short(false), black_castle_long(false), 
     en_passant_target(-1), halfmove_clock(0), fullmove_clock(0),
     active_color(-1) {
         for (int i = 0; i < 64; ++i) { 
-            board[i] = std::make_shared<Piece>();
+            board[i] = Piece::make_empty();
         }
     }
 
 MoveResult Board::move_piece(int start, int target) { 
     if (start == target) return MoveResult::NO_MOVE; // The piece didnt move.
 
+    // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
 
@@ -38,7 +38,7 @@ MoveResult Board::move_piece(int start, int target) {
 
     if (destination_target->color() != move_target->color()) { 
         this->board[target] = move_target; 
-        this->board[start] = std::make_shared<Piece>();
+        this->board[start] = Piece::make_empty();
 
         generate_legal_moves();
 
@@ -54,7 +54,7 @@ void Board::prune_illegal_moves(Piece_ptr piece, int piece_index) {
 
 void Board::generate_legal_moves() { 
     for (int i = 0; i < 64; ++i) { 
-        Piece_ptr piece = this->board[i];
+        Piece* piece = this->board[i].get();
         switch (piece->type()) { 
             case PieceType::ROOK: 
                 rook_moves(piece, i);
@@ -80,7 +80,7 @@ void Board::generate_legal_moves() {
     }
 }
 
-void Board::pawn_moves(Piece_ptr piece, int index) { 
+void Board::pawn_moves(Piece* piece, int index) { 
     std::set<int> white_starting_rank = {48, 49, 50, 51, 52, 53, 54, 55};
     std::set<int> black_starting_rank = {8, 9, 10, 11, 12, 13, 14, 15}; 
     piece->vision.clear();
@@ -108,8 +108,8 @@ void Board::pawn_moves(Piece_ptr piece, int index) {
             piece->vision.insert(advance_twice);
     } 
     
-    Piece_ptr left_target = this->board[left];
-    Piece_ptr right_target = this->board[right];
+    Piece* left_target = this->board[left].get();
+    Piece* right_target = this->board[right].get();
     
     if (
         ((left_target->data != PieceType::EMPTY
@@ -128,11 +128,11 @@ void Board::pawn_moves(Piece_ptr piece, int index) {
     ) piece->vision.insert(right);
 }
 
-void Board::cast_ray(Piece_ptr piece, int start, int direction) { 
+void Board::cast_ray(Piece* piece, int start, int direction) { 
     int current = start + direction;
     
     while (true) { 
-        Piece_ptr target = this->board[current];
+        Piece* target = this->board[current].get();
         
         if (target->data == PieceType::EMPTY) { // Empty square
             piece->vision.insert(current);
@@ -152,7 +152,7 @@ void Board::cast_ray(Piece_ptr piece, int start, int direction) {
     }
 }
 
-void Board::rook_moves(Piece_ptr piece, int index) { 
+void Board::rook_moves(Piece* piece, int index) { 
     piece->vision.clear();
 
     bool cast_west = !left_edges.contains(index);
@@ -177,7 +177,7 @@ void Board::rook_moves(Piece_ptr piece, int index) {
     }
 }
 
-void Board::bishop_moves(Piece_ptr piece, int index) { 
+void Board::bishop_moves(Piece* piece, int index) { 
     piece->vision.clear();
 
     bool on_left_edge = left_edges.contains(index);
@@ -198,18 +198,18 @@ void Board::bishop_moves(Piece_ptr piece, int index) {
     if (!on_right_edge && !on_bottom_edge) cast_ray(piece, index, Direction::SOUTH_EAST);
 }
 
-void Board::horsy_moves(Piece_ptr piece, int index) { 
+void Board::horsy_moves(Piece* piece, int index) { 
 
 }
 
-void Board::queen_moves(Piece_ptr piece, int index) { 
+void Board::queen_moves(Piece* piece, int index) { 
     rook_moves(piece, index);
     auto temp_moves = piece->vision; 
     bishop_moves(piece, index);
     piece->vision.merge(temp_moves);
 }   
 
-void Board::king_vision(Piece_ptr piece, int index) { 
+void Board::king_vision(Piece* piece, int index) { 
     piece->vision.clear();
 
     bool on_left_edge = left_edges.contains(index);
@@ -274,6 +274,20 @@ void Board::king_vision(Piece_ptr piece, int index) {
     }
 
     int color = piece->color(); 
+
+    switch (color) { 
+        case PieceType::WHITE: { 
+
+            break;
+        }
+        case PieceType::BLACK: { 
+
+            break;
+        }
+        default: 
+            // TODO handle error. We shouldn't ever get here tho so im just gonna ignore it for a while until my own incompetence catches up to me c:
+            break;
+    }
 
     if (color == PieceType::WHITE) { 
         if (this->white_castle_long) { 

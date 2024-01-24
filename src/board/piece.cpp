@@ -5,12 +5,21 @@
 int color_mask = 0b11000;
 int piece_mask = 0b00111;
 
+Piece::Piece() { 
+    this->data = PieceType::EMPTY;
+    this->vision = std::set<int>();
+}
+
 int Piece::color() { 
     return color_mask & this->data;
 }
 
 int Piece::type() { 
     return piece_mask & this->data;
+}
+
+std::shared_ptr<Piece> Piece::make_empty() { 
+    return std::make_shared<Piece>();
 }
 
 std::string Piece::name() { 
