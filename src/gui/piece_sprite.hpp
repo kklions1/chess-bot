@@ -16,7 +16,7 @@ typedef struct PieceSprite {
     sf::RectangleShape shape;
     Piece_ptr piece;
 
-    PieceSprite(std::shared_ptr<sf::Texture>, Piece_ptr); 
+    PieceSprite(std::shared_ptr<sf::Texture>, std::shared_ptr<Piece>); 
 
     void setPosition(const sf::Vector2f&);
     void hide(); 

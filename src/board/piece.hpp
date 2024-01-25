@@ -7,9 +7,6 @@
 #include <string> 
 #include <memory>
 
-extern int piece_mask;
-extern int color_mask;
-
 typedef struct Piece { 
     int data; 
     std::set<int> vision;
@@ -20,7 +17,6 @@ typedef struct Piece {
     std::string name(); 
 
     static std::shared_ptr<Piece> make_empty(); 
-    static std::shared_ptr<Piece> make_white_pawn();
 
     explicit Piece();
 

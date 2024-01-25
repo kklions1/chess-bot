@@ -393,7 +393,7 @@ void parse_piece_locations(const std::string& fen, Board& board) {
     int index = 0;
 
     while (it != fen.end()) { 
-        Piece_ptr current_piece = board.board[index]; 
+        Piece* current_piece = board.board[index].get(); 
         if (isdigit(*it)) { 
             index += (*it - '0'); 
         } else { 

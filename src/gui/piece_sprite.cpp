@@ -1,6 +1,6 @@
 #include "piece_sprite.hpp"
 
-PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, Piece_ptr piece) { 
+PieceSprite::PieceSprite(std::shared_ptr<sf::Texture> texture, std::shared_ptr<Piece> piece) { 
     this->piece = piece; 
     this->texture = texture; 
     this->shape = sf::RectangleShape(sf::Vector2f(100.0f, 100.0f));
@@ -15,10 +15,6 @@ void PieceSprite::setPosition(const sf::Vector2f& pos) {
 void PieceSprite::hide() { 
     this->shape.setFillColor(sf::Color(0));
 }
-
-// void PieceSprite::setPosition(const sf::Vector2i& pos) { 
-//     this->shape.setPosition(normalize_to_corner(pos));
-// }
 
 std::vector<PieceSprite_ptr> init_sprites(Board& board, const TextureMap& texture_map) {
     std::vector<PieceSprite_ptr> result;

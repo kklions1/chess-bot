@@ -15,7 +15,7 @@ extern std::set<int> top_edges; // 8th Rank
 extern std::set<int> bottom_edges; // 1st Rank
 
 typedef struct Board { 
-    Piece_ptr board[64];
+    std::shared_ptr<Piece> board[64];
 
     bool white_castle_short;
     bool white_castle_long;
