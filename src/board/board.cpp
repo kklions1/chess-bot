@@ -277,10 +277,24 @@ void Board::king_vision(Piece* piece, int index) {
 
     switch (color) { 
         case PieceType::WHITE: { 
+            if (this->white_castle_long) { 
+                piece->vision.insert(index + (2 * Direction::WEST));
+            }
+            
+            if (this->white_castle_short) { 
+                piece->vision.insert(index + (2 * Direction::EAST));
+            }
 
             break;
         }
         case PieceType::BLACK: { 
+            if (this->black_castle_long) { 
+                piece->vision.insert(index + (2 * Direction::WEST));
+            }   
+            
+            if (this->black_castle_short) { 
+                piece->vision.insert(index + (2 * Direction::EAST));
+            }
 
             break;
         }
@@ -289,29 +303,6 @@ void Board::king_vision(Piece* piece, int index) {
             break;
     }
 
-    if (color == PieceType::WHITE) { 
-        if (this->white_castle_long) { 
-            piece->vision.insert(index + (2 * Direction::WEST));
-        }
-        if (this->white_castle_short) { 
-            piece->vision.insert(index + (2 * Direction::EAST));
-        }
-    }
-
-    if (color == PieceType::BLACK) { 
-        if (this->black_castle_long) { 
-            piece->vision.insert(index + (2 * Direction::WEST));
-        }
-        if (this->black_castle_short) { 
-            piece->vision.insert(index + (2 * Direction::EAST));
-        }
-    }
-}
-
-
-
-void no_vision(Piece& self, int index) { 
-    /* no-op */ 
 }
 
 void print_board(const Board& board) { 
@@ -669,4 +660,9 @@ bool is_edge_in_direction(int i, int direction) {
         default:
             return is_edge_index(i);
     }
+}
+
+bool in_check(int color, const Board& board) { 
+
+    return false;
 }
