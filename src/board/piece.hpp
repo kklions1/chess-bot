@@ -13,8 +13,10 @@ typedef struct Piece {
 
     int color();
     int type();
+    void addAttack(int); 
 
     std::string name(); 
+    std::shared_ptr<Piece> copy();
 
     static std::shared_ptr<Piece> make_empty(); 
 

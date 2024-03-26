@@ -28,14 +28,19 @@ typedef struct Board {
 
     int active_color;
 
-    MoveResult move_piece(int, int);
+    MoveType move_piece(int, int);
     void prune_illegal_moves(Piece_ptr, int);
     void cast_ray(Piece*, int, int);
+    void add_attack(Piece*, int);
     
     // Pseudo-legal moves to start. 
     void generate_legal_moves();
 
     Board();
+
+    std::shared_ptr<Board> copy();
+    std::shared_ptr<Board> next_position(int, int);
+
 
     void pawn_moves(Piece*, int);
     void rook_moves(Piece*, int);

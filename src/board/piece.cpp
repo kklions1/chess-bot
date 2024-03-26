@@ -10,6 +10,14 @@ Piece::Piece() {
     this->vision = std::set<int>();
 }
 
+std::shared_ptr<Piece> Piece::copy() { 
+    auto copied = std::make_shared<Piece>();
+    copied->data = this->data;
+    copied->vision = this->vision;
+
+    return copied;
+}
+
 int Piece::color() { 
     return color_mask & this->data;
 }

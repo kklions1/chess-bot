@@ -18,14 +18,33 @@ Board::Board() :
         }
     }
 
-MoveResult Board::move_piece(int start, int target) { 
-    if (start == target) return MoveResult::NO_MOVE; // The piece didnt move.
+std::shared_ptr<Board> Board::copy() { 
+    auto copied = std::make_shared<Board>();
+
+    copied->white_castle_short = this->white_castle_short;
+    copied->white_castle_long = this->white_castle_long;
+    copied->black_castle_short = this->black_castle_short;
+    copied->black_castle_long = this->black_castle_long;
+    copied->en_passant_target = this->en_passant_target;
+    copied->halfmove_clock = this->halfmove_clock;
+    copied->fullmove_clock = this->fullmove_clock;
+    copied->active_color = this->active_color;
+
+    for (int i = 0; i < 64; ++i) { 
+        copied->board[i] = this->board[i]->copy();
+    }
+
+    return copied;
+}
+
+MoveType Board::move_piece(int start, int target) { 
+    if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
 
     // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
 
-    if (!move_target->vision.contains(target)) return MoveResult::NO_MOVE; // invalid move
+    if (!move_target->vision.contains(target)) return MoveType::NO_MOVE; // invalid move
 
     if (destination_target->data == PieceType::EMPTY) { 
         Piece_ptr temp = destination_target;
@@ -33,7 +52,7 @@ MoveResult Board::move_piece(int start, int target) {
         this->board[start] = temp;
 
         generate_legal_moves();
-        return MoveResult::MOVE;
+        return MoveType::MOVE;
     }
 
     if (destination_target->color() != move_target->color()) { 
@@ -42,13 +61,25 @@ MoveResult Board::move_piece(int start, int target) {
 
         generate_legal_moves();
 
-        return MoveResult::CAPTURE; 
+        return MoveType::CAPTURE; 
     }
 
-    return MoveResult::NO_MOVE;
+    return MoveType::NO_MOVE;
 }
 
 void Board::prune_illegal_moves(Piece_ptr piece, int piece_index) { 
+
+}
+
+std::shared_ptr<Board> Board::next_position(int start, int target) { 
+    auto next_position = this->copy(); 
+    switch (next_position->move_piece(start, target)) { 
+        case MoveType::NO_MOVE: 
+            return nullptr;
+        case MoveType::CAPTURE: 
+        case MoveType::MOVE: 
+            return next_position; 
+    }
 
 }
 
@@ -152,6 +183,13 @@ void Board::cast_ray(Piece* piece, int start, int direction) {
     }
 }
 
+void Board::add_attack(Piece* piece, int target_index) { 
+    int color = piece->color();
+    if (this->board[target_index]->color() != color) { 
+        piece->vision.insert(target_index);
+    }
+}
+
 void Board::rook_moves(Piece* piece, int index) { 
     piece->vision.clear();
 
@@ -199,12 +237,61 @@ void Board::bishop_moves(Piece* piece, int index) {
 }
 
 void Board::horsy_moves(Piece* piece, int index) { 
+    piece->vision.clear(); 
 
+    if (left_edges.contains(index)) {
+        // cant go west
+        add_attack(piece, index + Direction::NNE);
+        add_attack(piece, index + Direction::NEE);
+        add_attack(piece, index + Direction::SSE);
+        add_attack(piece, index + Direction::SEE);
+        return;
+
+    } 
+
+    if (right_edges.contains(index)) {
+        // cant go east
+        add_attack(piece, index + Direction::NNW);
+        add_attack(piece, index + Direction::NWW);
+        add_attack(piece, index + Direction::SSW);
+        add_attack(piece, index + Direction::SWW);
+        
+        return;
+    } 
+    
+    if (top_edges.contains(index)) {
+        // cant go north
+        add_attack(piece, index + Direction::SSE);
+        add_attack(piece, index + Direction::SEE);
+        add_attack(piece, index + Direction::SSW);
+        add_attack(piece, index + Direction::SWW);
+        return;
+    } 
+    
+    if (bottom_edges.contains(index)) {
+        // cant go south    
+        add_attack(piece, index + Direction::NNE);
+        add_attack(piece, index + Direction::NEE);
+        add_attack(piece, index + Direction::NNW);
+        add_attack(piece, index + Direction::NWW);
+        return; 
+    } 
+
+    if (!edges.contains(index)) {        
+        add_attack(piece, index + Direction::NNE);
+        add_attack(piece, index + Direction::NNW);
+        add_attack(piece, index + Direction::NEE);
+        add_attack(piece, index + Direction::NWW);
+        add_attack(piece, index + Direction::SSE);
+        add_attack(piece, index + Direction::SSW);
+        add_attack(piece, index + Direction::SEE);
+        add_attack(piece, index + Direction::SWW);
+    }    
 }
 
 void Board::queen_moves(Piece* piece, int index) { 
     rook_moves(piece, index);
-    auto temp_moves = piece->vision; 
+    auto temp_moves = piece->vision; // This has to exist because bishop_moves() clears the vision list 
     bishop_moves(piece, index);
     piece->vision.merge(temp_moves);
 }   

@@ -151,19 +151,19 @@ void gui_main(Board& board) {
                     sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
                     
                     switch (board.move_piece(move_target_starting_index, move_target_index = calculate_index(mouse_pos))) { 
-                        case MoveResult::NO_MOVE: { 
+                        case MoveType::NO_MOVE: { 
                             // Nothing happened, piece should go back to where it came from
                             drag_target->setPosition(calculate_position(move_target_starting_index));
                             break;
                         }
-                        case MoveResult::MOVE: { 
+                        case MoveType::MOVE: { 
                             // The piece moved. Snap it to the square that it should have moved to.
                             // Might require some double checking. things are kinda buggy
                             drag_target->setPosition(calculate_position(move_target_index));
                             legal_move_indicator.clear();
                             break;
                         }
-                        case MoveResult::CAPTURE: { 
+                        case MoveType::CAPTURE: { 
                             auto capture_target = get_sprite_at_board_index(move_target_index, pieces); 
 
                             if (capture_target != pieces.end()) pieces.erase(capture_target);

@@ -21,11 +21,20 @@ typedef enum Direction {
     NORTH_EAST = -7, 
     NORTH_WEST = -9, 
     SOUTH_EAST = 9, 
-    SOUTH_WEST = 7
+    SOUTH_WEST = 7, 
+    // Horsy Directions 
+    NNW = -17, 
+    NNE = -15, 
+    NEE = -6, 
+    NWW = -10, 
+    SSE = 17, 
+    SSW = 15, 
+    SEE = 10, 
+    SWW = 6
 } Direction;
 
-typedef enum MoveResult { 
+typedef enum MoveType { 
     NO_MOVE, 
     MOVE,
     CAPTURE 
-} MoveResult; 
+} MoveType; 
