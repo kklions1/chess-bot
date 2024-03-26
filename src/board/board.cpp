@@ -185,6 +185,10 @@ void Board::cast_ray(Piece* piece, int start, int direction) {
 
 void Board::add_attack(Piece* piece, int target_index) { 
     int color = piece->color();
+    if (target_index < 0 || target_index > 63) { 
+        return;
+    }
+
     if (this->board[target_index]->color() != color) { 
         piece->vision.insert(target_index);
     }
@@ -255,7 +259,6 @@ void Board::horsy_moves(Piece* piece, int index) {
         add_attack(piece, index + Direction::NWW);
         add_attack(piece, index + Direction::SSW);
         add_attack(piece, index + Direction::SWW);
-        
         return;
     } 
     
