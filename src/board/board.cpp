@@ -250,7 +250,6 @@ void Board::horsy_moves(Piece* piece, int index) {
         add_attack(piece, index + Direction::SSE);
         add_attack(piece, index + Direction::SEE);
         return;
-
     } 
 
     if (right_edges.contains(index)) {
@@ -723,6 +722,7 @@ void print_index() {
     std::cout << i << " ";
     counter++;
   }
+  std::cout << std::endl;
 }
 
 bool is_edge_index(int i) { 

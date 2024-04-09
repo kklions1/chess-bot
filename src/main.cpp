@@ -28,11 +28,7 @@ int main(int argc, char** argv) {
     parse_fen_string(starting_fen, *game_board);
     game_board->generate_legal_moves();
 
-
-    std::unordered_map<Piece*, std::set<int>> moves; 
-    moves[game_board->board[0].get()] = { 1, 2, 3, 4, 5, 6 }; 
-
-    std::cout << moves.at(game_board->board[0].get()).size() << std::endl;
+    Coordinate spot = Coordinate::from_index(36); 
 
 
     print_index();

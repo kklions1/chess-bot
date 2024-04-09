@@ -14,6 +14,7 @@ add_executable(chess
     src/board/piece.cpp
     src/engine/engine.cpp
     src/board/move_result.cpp
+    src/board/coordinate.cpp
 )
 
 # i have no idea how CMake finds these
