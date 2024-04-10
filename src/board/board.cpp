@@ -243,6 +243,31 @@ void Board::bishop_moves(Piece* piece, int index) {
 void Board::horsy_moves(Piece* piece, int index) { 
     piece->vision.clear(); 
 
+    std::set<int> inner_left = { 9, 17, 25, 33, 41, 49 };
+    std::set<int> inner_right = { 14, 22, 30, 38, 46, 54 };
+
+    if (inner_left.contains(index)) { 
+        // can't move two spaces west, can move one space west
+        add_attack(piece, index + Direction::NNE);
+        add_attack(piece, index + Direction::NNW);
+        add_attack(piece, index + Direction::NEE);
+        add_attack(piece, index + Direction::SSE);
+        add_attack(piece, index + Direction::SSW);
+        add_attack(piece, index + Direction::SEE);
+        return;
+    }
+
+    if (inner_right.contains(index)) { 
+        // can't move two spaces east, can move one space east
+        add_attack(piece, index + Direction::NNE);
+        add_attack(piece, index + Direction::NNW);
+        add_attack(piece, index + Direction::NWW);
+        add_attack(piece, index + Direction::SSE);
+        add_attack(piece, index + Direction::SSW);
+        add_attack(piece, index + Direction::SWW); 
+        return;
+    }
+
     if (left_edges.contains(index)) {
         // cant go west
         add_attack(piece, index + Direction::NNE);

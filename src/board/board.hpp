@@ -57,7 +57,6 @@ std::string generate_fen_string(const Board&);
 int get_board_index(const char*);
 std::vector<std::string> split(std::string, const char);
 void print_index();
-Coordinate get_coordinates(int);
 
 bool is_edge_index(int);
 bool is_edge_in_direction(int, int);
