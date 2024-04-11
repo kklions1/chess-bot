@@ -45,6 +45,8 @@ MoveType Board::move_piece(int start, int target) {
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
 
+    if (move_target->color() != this->active_color) return MoveType::NO_MOVE;
+
     if (!move_target->vision.contains(target)) return MoveType::NO_MOVE; // invalid move
 
     if (destination_target->data == PieceType::EMPTY) { 
@@ -88,9 +90,6 @@ std::shared_ptr<Board> Board::next_position(int start, int target) {
 void Board::generate_legal_moves() { 
     for (int i = 0; i < 64; ++i) { 
         Piece* piece = this->board[i].get();
-        if (piece->color() != this->active_color) { 
-            continue; 
-        }
 
         switch (piece->type()) { 
             case PieceType::ROOK: 

@@ -99,8 +99,10 @@ void debug_print_vector(const sf::Vector2f& vec) {
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }
 
-void show_moves_for_piece(PieceSprite_ptr vision_target, std::vector<sf::CircleShape>& legal_move_indicatior) { 
+void show_moves_for_piece(PieceSprite* vision_target, std::vector<sf::CircleShape>& legal_move_indicatior, int active_color) { 
     if (vision_target == nullptr) return;
+
+    if (vision_target->piece->color() != active_color) return;
 
     std::set<int> vision = vision_target->piece->vision; 
     for (int i : vision) { 
@@ -142,7 +144,7 @@ void gui_main(Board* board) {
                     vision_target = sprite_ptr;
                     
                     legal_move_indicator.clear();
-                    show_moves_for_piece(vision_target, legal_move_indicator);
+                    show_moves_for_piece(vision_target.get(), legal_move_indicator, board->active_color);
                     is_dragging = true;
                     break;
                 }
