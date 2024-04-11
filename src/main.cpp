@@ -2,12 +2,19 @@
 #include <memory>
 #include <string> 
 #include <thread> 
+#include <chrono> 
 #include <algorithm>
 #include <unordered_map>
 
 #include "gui/piece_sprite.hpp"
 #include "board/board.hpp"
 #include "gui/gui_main.hpp"
+
+void cpu_move(Board* board) { 
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    auto result = board->move_piece(11, 19);
+    std::cout << "Move made: " << result << std::endl;
+}
 
 int main(int argc, char** argv) {
     std::vector<std::string> program_args; 
@@ -28,13 +35,13 @@ int main(int argc, char** argv) {
     parse_fen_string(starting_fen, *game_board);
     game_board->generate_legal_moves();
 
-    Coordinate spot = Coordinate::from_index(36); 
-
-
+    
     print_index();
    
+    std::thread engine_thread(cpu_move, game_board.get());
+
     if (draw_gui) { 
-        gui_main(*game_board);
+        gui_main(game_board.get());
     } else { 
         main_window.close();
     }

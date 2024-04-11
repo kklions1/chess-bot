@@ -38,6 +38,7 @@ std::shared_ptr<Board> Board::copy() {
 }
 
 MoveType Board::move_piece(int start, int target) { 
+    std::cout << "moving piece " << start << " to " << target << std::endl;
     if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
 
     // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
@@ -51,6 +52,7 @@ MoveType Board::move_piece(int start, int target) {
         this->board[target] = move_target;
         this->board[start] = temp;
 
+        increment_clock();
         generate_legal_moves();
         return MoveType::MOVE;
     }
@@ -59,8 +61,8 @@ MoveType Board::move_piece(int start, int target) {
         this->board[target] = move_target; 
         this->board[start] = Piece::make_empty();
 
+        increment_clock();
         generate_legal_moves();
-
         return MoveType::CAPTURE; 
     }
 
@@ -86,6 +88,10 @@ std::shared_ptr<Board> Board::next_position(int start, int target) {
 void Board::generate_legal_moves() { 
     for (int i = 0; i < 64; ++i) { 
         Piece* piece = this->board[i].get();
+        if (piece->color() != this->active_color) { 
+            continue; 
+        }
+
         switch (piece->type()) { 
             case PieceType::ROOK: 
                 rook_moves(piece, i);
@@ -142,7 +148,8 @@ void Board::pawn_moves(Piece* piece, int index) {
     Piece* left_target = this->board[left].get();
     Piece* right_target = this->board[right].get();
     
-    if (
+    // These if statements are why we need comments.
+    if ( 
         ((left_target->data != PieceType::EMPTY
         && left_target->color() != piece->color()) 
         || (left_target->data == PieceType::EMPTY
@@ -243,8 +250,8 @@ void Board::bishop_moves(Piece* piece, int index) {
 void Board::horsy_moves(Piece* piece, int index) { 
     piece->vision.clear(); 
 
-    std::set<int> inner_left = { 9, 17, 25, 33, 41, 49 };
-    std::set<int> inner_right = { 14, 22, 30, 38, 46, 54 };
+    std::set<int> inner_left = { 1, 9, 17, 25, 33, 41, 49, 57};
+    std::set<int> inner_right = { 6, 14, 22, 30, 38, 46, 54, 62 };
 
     if (inner_left.contains(index)) { 
         // can't move two spaces west, can move one space west
@@ -780,4 +787,18 @@ bool is_edge_in_direction(int i, int direction) {
 bool in_check(int color, const Board& board) { 
 
     return false;
+}
+
+void Board::increment_clock() { 
+    this->halfmove_clock++; 
+    if (this->active_color == PieceType::WHITE) { 
+        this->active_color = PieceType::BLACK;
+        return;
+    } 
+
+    if (this->active_color == PieceType::BLACK) { 
+        this->active_color = PieceType::WHITE;
+        this->fullmove_clock++;
+        return;
+    }
 }

@@ -113,7 +113,7 @@ void show_moves_for_piece(PieceSprite_ptr vision_target, std::vector<sf::CircleS
     }
 }
 
-void gui_main(Board& board) {
+void gui_main(Board* board) {
     auto texture_map = init_textures();
     auto squares = init_squares();
     auto pieces = init_sprites(board, texture_map);
@@ -123,6 +123,8 @@ void gui_main(Board& board) {
     int move_target_starting_index;
     int move_target_index;
     bool is_dragging = false;
+
+    int current_halfmove_clock = board->halfmove_clock; 
 
     while (main_window.isOpen()) {
         sf::Event event;
@@ -150,7 +152,7 @@ void gui_main(Board& board) {
 
                     sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));
                     
-                    switch (board.move_piece(move_target_starting_index, move_target_index = calculate_index(mouse_pos))) { 
+                    switch (board->move_piece(move_target_starting_index, move_target_index = calculate_index(mouse_pos))) { 
                         case MoveType::NO_MOVE: { 
                             // Nothing happened, piece should go back to where it came from
                             drag_target->setPosition(calculate_position(move_target_starting_index));
@@ -197,6 +199,11 @@ void gui_main(Board& board) {
         }
 
         main_window.clear(sf::Color::Green); // If green is showing, its probably because of some rendering problem
+
+        if (current_halfmove_clock != board->halfmove_clock) { 
+            pieces = init_sprites(board, texture_map);
+            current_halfmove_clock = board->halfmove_clock;
+        }
 
         if (is_dragging && drag_target != nullptr) {
             sf::Vector2f mouse_pos(sf::Mouse::getPosition(main_window));

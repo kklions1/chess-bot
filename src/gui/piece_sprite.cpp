@@ -16,10 +16,10 @@ void PieceSprite::hide() {
     this->shape.setFillColor(sf::Color(0));
 }
 
-std::vector<PieceSprite_ptr> init_sprites(Board& board, const TextureMap& texture_map) {
+std::vector<PieceSprite_ptr> init_sprites(Board* board, const TextureMap& texture_map) {
     std::vector<PieceSprite_ptr> result;
     for (int i = 0; i < 64; ++i) { 
-        auto piece = board.board[i];
+        auto piece = board->board[i];
         if (piece->data != PieceType::EMPTY) { 
             auto sprite = std::make_shared<PieceSprite>(texture_map.at(piece->data), piece);
             sprite->shape.setPosition(calculate_position(i));

@@ -49,6 +49,9 @@ typedef struct Board {
     void horsy_moves(Piece*, int);
     void queen_moves(Piece*, int);
     void king_vision(Piece*, int);
+
+private: 
+    void increment_clock();
 } Board; 
 
 void print_board(const Board&); 
