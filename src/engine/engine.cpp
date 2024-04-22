@@ -5,6 +5,7 @@
 #include <cstdlib> 
 #include <unordered_map>
 #include <utility>
+#include <time.h> 
 
 #include "engine_state.hpp" 
 
@@ -29,12 +30,17 @@ std::pair<int, int> generate_random_move() {
 void engine_main(std::shared_ptr<Board> board) { 
     state = EngineState::init(board); 
     
+    srand(time(0));
+
     while (true) { 
-        std::pair<int, int> move = generate_random_move(); 
+        int computer_color = PieceType::BLACK; // TODO parameterize this, somehow. Maybe through UI?
 
-        board->move_piece(move.first, move.second); 
-
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        if (board->active_color == computer_color) { 
+            std::pair<int, int> move = generate_random_move(); 
+            board->move_piece(move.first, move.second); 
+        }
+        
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     
 }
