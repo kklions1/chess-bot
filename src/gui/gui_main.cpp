@@ -115,17 +115,16 @@ void show_moves_for_piece(PieceSprite* vision_target, std::vector<sf::CircleShap
     }
 }
 
-void gui_main(Board* board) {
+void gui_main(std::shared_ptr<Board> board) {
     auto texture_map = init_textures();
     auto squares = init_squares();
-    auto pieces = init_sprites(board, texture_map);
+    auto pieces = init_sprites(board.get(), texture_map);
     std::vector<sf::CircleShape> legal_move_indicator;
     PieceSprite_ptr drag_target;
     PieceSprite_ptr vision_target;
     int move_target_starting_index;
     int move_target_index;
     bool is_dragging = false;
-
     int current_halfmove_clock = board->halfmove_clock; 
 
     while (main_window.isOpen()) {
@@ -203,7 +202,7 @@ void gui_main(Board* board) {
         main_window.clear(sf::Color::Green); // If green is showing, its probably because of some rendering problem
 
         if (current_halfmove_clock != board->halfmove_clock) { 
-            pieces = init_sprites(board, texture_map);
+            pieces = init_sprites(board.get(), texture_map);
             current_halfmove_clock = board->halfmove_clock;
         }
 

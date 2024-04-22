@@ -17,4 +17,4 @@ std::vector<sf::RectangleShape> init_squares();
 TextureMap init_textures(); 
 void debug_print_vector(const sf::Vector2f&);
 sf::Vector2f normalize_to_corner(const sf::Vector2f&); 
-void gui_main(Board*);
+void gui_main(std::shared_ptr<Board>);

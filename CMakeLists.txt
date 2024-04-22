@@ -13,6 +13,7 @@ add_executable(chess
     src/gui/piece_sprite.cpp
     src/board/piece.cpp
     src/engine/engine.cpp
+    src/engine/engine_state.cpp
     src/board/move_result.cpp
     src/board/coordinate.cpp
 )
