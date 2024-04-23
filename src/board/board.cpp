@@ -56,6 +56,9 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
         next->board[target] = move_target;
         next->board[start] = temp;
 
+        next->en_passant_target = -1; 
+        next->check_en_pessant(start, target);
+        next->check_castling(target);
         next->increment_clock();
         next->calc_piece_vision();
         return next;
@@ -65,6 +68,9 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
         next->board[target] = move_target; 
         next->board[start] = Piece::make_empty();
 
+        next->en_passant_target = -1; 
+        next->check_en_pessant(start, target);
+        next->check_castling(target);
         next->increment_clock();
         next->calc_piece_vision();
         return next; 
@@ -90,6 +96,9 @@ MoveType Board::move_piece(int start, int target) {
         this->board[target] = move_target;
         this->board[start] = temp;
 
+        this->en_passant_target = -1;
+        check_en_pessant(start, target);
+        check_castling(target);
         increment_clock();
         generate_legal_moves();
         return MoveType::MOVE;
@@ -99,6 +108,9 @@ MoveType Board::move_piece(int start, int target) {
         this->board[target] = move_target; 
         this->board[start] = Piece::make_empty();
 
+        this->en_passant_target = -1;
+        check_en_pessant(start, target);
+        check_castling(target);
         increment_clock();
         generate_legal_moves();
         return MoveType::CAPTURE; 
@@ -125,12 +137,13 @@ void Board::prune_illegal_moves() {
             }
         }
 
-        
         if (invalid_moves.empty()) { continue; }
 
         for (auto it = invalid_moves.begin(); it != invalid_moves.end(); it++) { 
             current->vision.erase(*it);
         }
+
+        invalid_moves.clear();
     }
 }
 
@@ -450,9 +463,9 @@ void Board::king_vision(Piece* piece, int index) {
     }
 
     if (!on_right_edge && !on_bottom_edge) { 
-        int sw_target = index + Direction::SOUTH_WEST; 
-        if (this->board[sw_target]->data == PieceType::EMPTY || this->board[sw_target]->color() != piece->color()) { 
-            piece->vision.insert(sw_target);
+        int se_target = index + Direction::SOUTH_EAST; 
+        if (this->board[se_target]->data == PieceType::EMPTY || this->board[se_target]->color() != piece->color()) { 
+            piece->vision.insert(se_target);
         }
     }
 
@@ -460,23 +473,27 @@ void Board::king_vision(Piece* piece, int index) {
 
     switch (color) { 
         case PieceType::WHITE: { 
-            if (this->white_castle_long) { 
-                piece->vision.insert(index + (2 * Direction::WEST));
+            if (this->white_castle_long) {
+                int castle_target = index + (2 * Direction::WEST); 
+                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
             }
             
             if (this->white_castle_short) { 
-                piece->vision.insert(index + (2 * Direction::EAST));
+                int castle_target = index + (2 * Direction::EAST); 
+                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
             }
 
             break;
         }
         case PieceType::BLACK: { 
             if (this->black_castle_long) { 
-                piece->vision.insert(index + (2 * Direction::WEST));
+                int castle_target = index + (2 * Direction::WEST); 
+                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
             }   
             
             if (this->black_castle_short) { 
-                piece->vision.insert(index + (2 * Direction::EAST));
+                int castle_target = index + (2 * Direction::EAST); 
+                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
             }
 
             break;
@@ -931,4 +948,45 @@ bool Board::nap_in_check() {
     }
 
     return false;
+}
+
+void Board::check_en_pessant(int start, int target) { 
+    if (this->board[start]->type() != PieceType::PAWN) { return; }
+
+    int distance = target - start; 
+    if (distance == (Direction::NORTH * 2)) { 
+        this->en_passant_target = target + Direction::SOUTH; 
+    }
+
+    if (distance == (Direction::SOUTH * 2)) { 
+        this->en_passant_target = target + Direction::NORTH; 
+    }
+}
+
+void Board::check_castling(int moved_piece_index) { 
+    Piece* moved = this->board[moved_piece_index].get();
+    int moved_type = moved->type(); 
+    
+    if (moved_type != PieceType::KING && moved_type != PieceType::ROOK) { return; }
+
+    // simple, if the king moves, you can castle anymore. even if the move was a castle.
+    if (moved_type == PieceType::KING) { 
+        if (moved->color() == PieceType::WHITE) { 
+            this->white_castle_long = false;
+            this->white_castle_short = false;
+        } else { 
+            this->black_castle_long = false;
+            this->black_castle_short = false;
+        }
+
+        return;
+    }
+
+    // If we get here, the piece must be a rook. no sense in checking it again.
+    if (moved->color() == PieceType::WHITE) { 
+        
+    } else { 
+
+    }
+
 }

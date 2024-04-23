@@ -58,6 +58,9 @@ private:
     int find_king_index_by_color(int);
     void prune_illegal_moves();
     void calc_piece_vision(); 
+    void check_en_pessant(int, int);
+    void check_castling(int);  
+
     std::shared_ptr<Board> peek_next_position(int, int); 
 
 } Board; 
