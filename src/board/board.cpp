@@ -56,8 +56,8 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
         next->board[target] = move_target;
         next->board[start] = temp;
 
-        increment_clock();
-        calc_piece_vision();
+        next->increment_clock();
+        next->calc_piece_vision();
         std::cout << "move to empty\n";
         return next;
     }
@@ -66,8 +66,8 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
         next->board[target] = move_target; 
         next->board[start] = Piece::make_empty();
 
-        increment_clock();
-        calc_piece_vision();
+        next->increment_clock();
+        next->calc_piece_vision();
         std::cout << "move captures\n";
         return next; 
     }
@@ -126,9 +126,7 @@ void Board::prune_illegal_moves() {
             std::cout << "peek is not null\n";
 
             if (peek->nap_in_check()) { 
-                
-                // current->vision.erase(target);
-                // i--; 
+                current->vision.erase(target);
             }
         }
     }
@@ -178,7 +176,7 @@ void Board::generate_legal_moves() {
     std::cout << "calc piece vision" << std::endl;
     calc_piece_vision();
     std::cout << "prune illegal moves" << std::endl;
-    // prune_illegal_moves();
+    prune_illegal_moves();
 }
 
 void Board::pawn_moves(Piece* piece, int index) { 
