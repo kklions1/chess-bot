@@ -121,7 +121,6 @@ void Board::prune_illegal_moves() {
             if (peek == nullptr) { continue; }
 
             if (peek->nap_in_check()) { 
-                std::cout << "move (" << i << ", " << target << ") is check for " << colorName(peek->active_color) << std::endl;
                 invalid_moves.insert(target);
             }
         }
@@ -130,7 +129,6 @@ void Board::prune_illegal_moves() {
         if (invalid_moves.empty()) { continue; }
 
         for (auto it = invalid_moves.begin(); it != invalid_moves.end(); it++) { 
-            std::cout << "found checks, erasing\n";
             current->vision.erase(*it);
         }
     }
@@ -177,9 +175,7 @@ void Board::calc_piece_vision() {
 }
 
 void Board::generate_legal_moves() { 
-    std::cout << "calc piece vision" << std::endl;
     calc_piece_vision();
-    std::cout << "prune illegal moves" << std::endl;
     prune_illegal_moves();
 }
 
@@ -926,8 +922,6 @@ bool Board::nap_in_check() {
         if (current->data == PieceType::EMPTY) { continue; }
 
         if (current->color() == inactive_color) { continue; }  
-
-        std::cout << current->name() << std::endl;     
 
         for (int target : current->vision) { 
             if (target == nap_king_index) { 

@@ -19,9 +19,7 @@ int main(int argc, char** argv) {
     parse_fen_string(starting_fen, *game_board);
     game_board->generate_legal_moves();
 
-    std::cout << "init complete" << std::endl;
-
-    print_index();
+    // print_index();
    
     std::thread engine_thread(engine_main, game_board);
 
