@@ -31,7 +31,6 @@ typedef struct Board {
     int active_color;
 
     MoveType move_piece(int, int);
-    void prune_illegal_moves(Piece_ptr, int);
     void cast_ray(Piece*, int, int);
     void add_attack(Piece*, int);
     
@@ -40,8 +39,12 @@ typedef struct Board {
 
     Board();
 
-    std::shared_ptr<Board> copy();
+    std::shared_ptr<Board> clone();
     std::shared_ptr<Board> next_position(int, int);
+
+    bool active_player_in_check();
+    bool nap_in_check(); 
+    int get_ap_king_index(); 
 
     void pawn_moves(Piece*, int);
     void rook_moves(Piece*, int);
@@ -52,6 +55,11 @@ typedef struct Board {
 
 private: 
     void increment_clock();
+    int find_king_index_by_color(int);
+    void prune_illegal_moves();
+    void calc_piece_vision(); 
+    std::shared_ptr<Board> peek_next_position(int, int); 
+
 } Board; 
 
 void print_board(const Board&); 

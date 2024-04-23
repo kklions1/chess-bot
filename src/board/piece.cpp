@@ -10,11 +10,11 @@ Piece::Piece() {
     this->vision = std::set<int>();
 }
 
-std::shared_ptr<Piece> Piece::copy() { 
+std::shared_ptr<Piece> Piece::clone() { 
     auto copied = std::make_shared<Piece>();
     copied->data = this->data;
-    copied->vision = this->vision;
-
+    copied->vision.insert(this->vision.begin(), this->vision.end());
+    
     return copied;
 }
 
@@ -31,6 +31,8 @@ std::shared_ptr<Piece> Piece::make_empty() {
 }
 
 std::string Piece::name() { 
+    if (this->data == PieceType::EMPTY) { return "Empty"; }
+
     std::string name = ""; 
 
     switch(this->color()) { 

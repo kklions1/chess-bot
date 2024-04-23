@@ -16,7 +16,7 @@ typedef struct Piece {
     void addAttack(int); 
 
     std::string name(); 
-    std::shared_ptr<Piece> copy();
+    std::shared_ptr<Piece> clone();
 
     static std::shared_ptr<Piece> make_empty(); 
 

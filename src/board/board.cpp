@@ -18,7 +18,7 @@ Board::Board() :
         }
     }
 
-std::shared_ptr<Board> Board::copy() { 
+std::shared_ptr<Board> Board::clone() { 
     auto copied = std::make_shared<Board>();
 
     copied->white_castle_short = this->white_castle_short;
@@ -31,16 +31,54 @@ std::shared_ptr<Board> Board::copy() {
     copied->active_color = this->active_color;
 
     for (int i = 0; i < 64; ++i) { 
-        copied->board[i] = this->board[i]->copy();
+        copied->board[i]->data = this->board[i]->data;
+        copied->board[i]->vision.insert(this->board[i]->vision.begin(), this->board[i]->vision.end());
     }
 
     return copied;
 }
 
-MoveType Board::move_piece(int start, int target) { 
-    std::cout << "moving piece " << start << " to " << target << std::endl;
-    if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
+// take a peek at what pieces will be able to see if a move is executed
+std::shared_ptr<Board> Board::peek_next_position(int start, int target) { 
+    if (start == target) return nullptr; // The piece didnt move.
+    
+    auto next = this->clone();
 
+    Piece_ptr move_target = next->board[start];
+    Piece_ptr destination_target = next->board[target];
+
+    if (move_target->color() != next->active_color) return nullptr;
+
+    if (!move_target->vision.contains(target)) return nullptr; // invalid move
+
+    if (destination_target->data == PieceType::EMPTY) { 
+        Piece_ptr temp = destination_target;
+        next->board[target] = move_target;
+        next->board[start] = temp;
+
+        increment_clock();
+        calc_piece_vision();
+        std::cout << "move to empty\n";
+        return next;
+    }
+
+    if (destination_target->color() != move_target->color()) { 
+        next->board[target] = move_target; 
+        next->board[start] = Piece::make_empty();
+
+        increment_clock();
+        calc_piece_vision();
+        std::cout << "move captures\n";
+        return next; 
+    }
+
+    return nullptr;
+}
+
+MoveType Board::move_piece(int start, int target) { 
+    // std::cout << "moving piece " << start << " to " << target << std::endl;
+    if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
+    
     // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
     Piece_ptr move_target = this->board[start];
     Piece_ptr destination_target = this->board[target];
@@ -71,12 +109,33 @@ MoveType Board::move_piece(int start, int target) {
     return MoveType::NO_MOVE;
 }
 
-void Board::prune_illegal_moves(Piece_ptr piece, int piece_index) { 
+void Board::prune_illegal_moves() { 
+    for (int i = 0; i < 64; ++i) { 
+        Piece* current = this->board[i].get();
 
+        if (current->data == PieceType::EMPTY) { continue; }
+
+        std::cout << "Piece vision count " << current->vision.size() << std::endl;
+        for (int target : current->vision) { 
+            
+            auto peek = peek_next_position(i, target);
+            std::cout << "peek successful\n"; 
+
+            if (peek == nullptr) { continue; }
+
+            std::cout << "peek is not null\n";
+
+            if (peek->nap_in_check()) { 
+                
+                // current->vision.erase(target);
+                // i--; 
+            }
+        }
+    }
 }
 
 std::shared_ptr<Board> Board::next_position(int start, int target) { 
-    auto next_position = this->copy(); 
+    auto next_position = this->clone(); 
     switch (next_position->move_piece(start, target)) { 
         case MoveType::NO_MOVE: 
             return nullptr;
@@ -84,10 +143,9 @@ std::shared_ptr<Board> Board::next_position(int start, int target) {
         case MoveType::MOVE: 
             return next_position; 
     }
-
 }
 
-void Board::generate_legal_moves() { 
+void Board::calc_piece_vision() { 
     for (int i = 0; i < 64; ++i) { 
         Piece* piece = this->board[i].get();
 
@@ -114,6 +172,13 @@ void Board::generate_legal_moves() {
                 break;
         }
     }
+}
+
+void Board::generate_legal_moves() { 
+    std::cout << "calc piece vision" << std::endl;
+    calc_piece_vision();
+    std::cout << "prune illegal moves" << std::endl;
+    // prune_illegal_moves();
 }
 
 void Board::pawn_moves(Piece* piece, int index) { 
@@ -783,11 +848,6 @@ bool is_edge_in_direction(int i, int direction) {
     }
 }
 
-bool in_check(int color, const Board& board) { 
-
-    return false;
-}
-
 void Board::increment_clock() { 
     this->halfmove_clock++; 
     if (this->active_color == PieceType::WHITE) { 
@@ -800,4 +860,86 @@ void Board::increment_clock() {
         this->fullmove_clock++;
         return;
     }
+}
+
+int Board::find_king_index_by_color(int color) { 
+    for (int i = 0; i < 64; ++i) { 
+        if (this->board[i]->data == (PieceType::KING & color)) { 
+            return i; 
+        }
+    }
+
+    throw std::runtime_error("King not found"); 
+}
+
+int Board::get_ap_king_index() { 
+    int active_color = this->active_color; 
+
+    for (int i = 0; i < 64; ++i) { 
+        if (this->board[i]->data == (PieceType::KING & active_color)) { 
+            return i; 
+        }
+    }
+
+    throw std::runtime_error("King not found"); 
+}
+
+bool Board::active_player_in_check() { 
+    int active_color = this->active_color; 
+    int ap_king_index = get_ap_king_index();
+
+    for (int i = 0; i < 64; ++i) { 
+        Piece* current = this->board[i].get(); 
+
+        if (current->data == PieceType::EMPTY) { continue; }
+
+        if (current->color() == active_color) { 
+            continue;
+        }        
+
+        for (int target : current->vision) { 
+            if (target == ap_king_index) { 
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// non-active player, or "The person who just played a move"
+bool Board::nap_in_check() { 
+    int inactive_color;     
+    if (this->active_color == PieceType::WHITE) { 
+        inactive_color = PieceType::BLACK; 
+    } else { 
+        inactive_color = PieceType::WHITE; 
+    }
+
+    std::cout << "Inactive color: " << inactive_color << std::endl;
+
+    int nap_king_index = find_king_index_by_color(inactive_color);
+
+    std::cout << "Inactive king location: " << nap_king_index << std::endl;
+
+    for (int i = 0; i < 64; ++i) { 
+        Piece* current = this->board[i].get(); 
+
+        if (current->data == PieceType::EMPTY) { continue; }
+
+        if (current->color() == inactive_color) { continue; }  
+
+        std::cout << current->name() << std::endl;     
+
+        for (int target : current->vision) { 
+            std::cout << "can see " << target << std::endl;
+            if (target == nap_king_index) { 
+                std::cout << "Check found" << std::endl;
+                return true;
+            }
+            std::cout << "not a check\n";
+        }
+    }
+
+    return false;
 }
