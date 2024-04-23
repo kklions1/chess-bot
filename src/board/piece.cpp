@@ -30,6 +30,14 @@ std::shared_ptr<Piece> Piece::make_empty() {
     return std::make_shared<Piece>();
 }
 
+std::string colorName(int color) { 
+    if (color == PieceType::WHITE) { 
+        return "White";
+    } else { 
+        return "Black";
+    }
+}
+
 std::string Piece::name() { 
     if (this->data == PieceType::EMPTY) { return "Empty"; }
 

@@ -27,3 +27,5 @@ private:
 } Piece; 
 
 typedef std::shared_ptr<Piece> Piece_ptr;
+
+std::string colorName(int);
