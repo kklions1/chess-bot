@@ -18,6 +18,12 @@ Board::Board() :
         }
     }
 
+Piece* Board::piece_at(int index) {
+    if (index < 0 || index >= 64) { return nullptr; }
+    
+    return this->board[index].get(); 
+}    
+
 std::shared_ptr<Board> Board::clone() { 
     auto copied = std::make_shared<Board>();
 
@@ -44,15 +50,15 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
     
     auto next = this->clone();
 
-    Piece_ptr move_target = next->board[start];
-    Piece_ptr destination_target = next->board[target];
+    std::shared_ptr<Piece> move_target = next->board[start];
+    std::shared_ptr<Piece> destination_target = next->board[target];
 
     if (move_target->color() != next->active_color) return nullptr;
 
     if (!move_target->vision.contains(target)) return nullptr; // invalid move
 
     if (destination_target->data == PieceType::EMPTY) { 
-        Piece_ptr temp = destination_target;
+        std::shared_ptr<Piece> temp = destination_target;
         next->board[target] = move_target;
         next->board[start] = temp;
 
@@ -80,22 +86,20 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
 }
 
 MoveType Board::move_piece(int start, int target) { 
-    // std::cout << "moving piece " << start << " to " << target << std::endl;
+   
+     // std::cout << "moving piece " << start << " to " << target << std::endl;
     if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
     
     // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
-    Piece_ptr move_target = this->board[start];
-    Piece_ptr destination_target = this->board[target];
+    Piece* move_piece = piece_at(start);
+    Piece* target_piece = piece_at(target);
 
-    if (move_target->color() != this->active_color) return MoveType::NO_MOVE;
+    if (move_piece->color() != this->active_color) return MoveType::NO_MOVE;
 
-    if (!move_target->vision.contains(target)) return MoveType::NO_MOVE; // invalid move
+    if (!move_piece->vision.contains(target)) return MoveType::NO_MOVE; // invalid move
 
-    if (destination_target->data == PieceType::EMPTY) { 
-        Piece_ptr temp = destination_target;
-        this->board[target] = move_target;
-        this->board[start] = temp;
-
+    if (target_piece->data == PieceType::EMPTY) { 
+        move(move_piece, target_piece);
         this->en_passant_target = -1;
         check_en_pessant(start, target);
         check_castling(target);
@@ -104,9 +108,8 @@ MoveType Board::move_piece(int start, int target) {
         return MoveType::MOVE;
     }
 
-    if (destination_target->color() != move_target->color()) { 
-        this->board[target] = move_target; 
-        this->board[start] = Piece::make_empty();
+    if (target_piece->color() != move_piece->color()) { 
+        move(move_piece, target_piece);
 
         this->en_passant_target = -1;
         check_en_pessant(start, target);
@@ -118,6 +121,46 @@ MoveType Board::move_piece(int start, int target) {
 
     return MoveType::NO_MOVE;
 }
+
+// MoveType Board::move_piece(int start, int target) { 
+//     // std::cout << "moving piece " << start << " to " << target << std::endl;
+//     if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
+    
+//     // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
+//     std::shared_ptr<Piece> move_target = this->board[start];
+//     std::shared_ptr<Piece> destination_target = this->board[target];
+
+//     if (move_target->color() != this->active_color) return MoveType::NO_MOVE;
+
+//     if (!move_target->vision.contains(target)) return MoveType::NO_MOVE; // invalid move
+
+//     if (destination_target->data == PieceType::EMPTY) { 
+//         std::shared_ptr<Piece> temp = destination_target;
+//         this->board[target] = move_target;
+//         this->board[start] = temp;
+
+//         this->en_passant_target = -1;
+//         check_en_pessant(start, target);
+//         check_castling(target);
+//         increment_clock();
+//         generate_legal_moves();
+//         return MoveType::MOVE;
+//     }
+
+//     if (destination_target->color() != move_target->color()) { 
+//         this->board[target] = move_target; 
+//         this->board[start] = Piece::make_empty();
+
+//         this->en_passant_target = -1;
+//         check_en_pessant(start, target);
+//         check_castling(target);
+//         increment_clock();
+//         generate_legal_moves();
+//         return MoveType::CAPTURE; 
+//     }
+
+//     return MoveType::NO_MOVE;
+// }
 
 void Board::prune_illegal_moves() { 
     for (int i = 0; i < 64; ++i) { 
@@ -220,25 +263,37 @@ void Board::pawn_moves(Piece* piece, int index) {
             piece->vision.insert(advance_twice);
     } 
     
-    Piece* left_target = this->board[left].get();
-    Piece* right_target = this->board[right].get();
+    Piece* left_target = piece_at(left);
+    Piece* right_target = piece_at(right);
     
-    // These if statements are why we need comments.
-    if ( 
-        ((left_target->data != PieceType::EMPTY
-        && left_target->color() != piece->color()) 
-        || (left_target->data == PieceType::EMPTY
-            && left == this->en_passant_target))
-        && !left_edges.contains(advance)
-    ) piece->vision.insert(left);
+    if (left_target == nullptr) { 
+        std::cout << "index: " << index << std::endl;
+        std::cout << "piece: " << piece->name() << std::endl;
+        std::cout << "target index: " << left << std::endl; 
+    }
 
-    if (
-        ((right_target->data != PieceType::EMPTY
-        && right_target->color() != piece->color()) 
-        || (right_target->data == PieceType::EMPTY
-            && right == this->en_passant_target))
-        && !right_edges.contains(advance)
-    ) piece->vision.insert(right);
+    // These if statements are why we need comments.
+    if (left_target != nullptr) { 
+        if ( 
+            left_target != nullptr &&
+            ((left_target->data != PieceType::EMPTY
+            && left_target->color() != piece->color()) 
+            || (left_target->data == PieceType::EMPTY
+                && left == this->en_passant_target))
+            && !left_edges.contains(advance)
+        ) piece->vision.insert(left);
+    }
+    
+    if (right_target != nullptr) { 
+        if (
+            right_target != nullptr &&
+            ((right_target->data != PieceType::EMPTY
+            && right_target->color() != piece->color()) 
+            || (right_target->data == PieceType::EMPTY
+                && right == this->en_passant_target))
+            && !right_edges.contains(advance)
+        ) piece->vision.insert(right);    
+    }
 }
 
 void Board::cast_ray(Piece* piece, int start, int direction) { 

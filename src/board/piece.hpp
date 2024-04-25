@@ -13,7 +13,6 @@ typedef struct Piece {
 
     int color();
     int type();
-    void addAttack(int); 
 
     std::string name(); 
     std::shared_ptr<Piece> clone();
@@ -26,6 +25,5 @@ private:
     explicit Piece(int);
 } Piece; 
 
-typedef std::shared_ptr<Piece> Piece_ptr;
-
 std::string colorName(int);
+void move(Piece*, Piece*);

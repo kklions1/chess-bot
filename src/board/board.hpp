@@ -53,6 +53,8 @@ typedef struct Board {
     void queen_moves(Piece*, int);
     void king_vision(Piece*, int);
 
+    Piece* piece_at(int); 
+
 private: 
     void increment_clock();
     int find_king_index_by_color(int);
