@@ -1,13 +1,5 @@
 #include "board.hpp" 
 
-std::set<int> edges = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 23, 24,
-     31, 32, 39, 40, 47, 48, 55, 56, 57, 58, 59, 60, 61, 62, 63 }; 
-
-std::set<int> left_edges = { 0, 8, 16, 24, 32, 40, 48, 56 };
-std::set<int> right_edges = { 7, 15, 23, 31, 39, 47, 55, 63 };
-std::set<int> top_edges = { 0, 1, 2, 3, 4, 5, 6, 7 };
-std::set<int> bottom_edges = { 56, 57, 58, 59, 60, 61, 62, 63 };
-
 Board::Board() :
     white_castle_short(false), white_castle_long(false),
     black_castle_short(false), black_castle_long(false), 
@@ -18,6 +10,59 @@ Board::Board() :
         }
     }
 
+Board::Board(
+    std::array<std::shared_ptr<Piece>, 64> pieces, 
+    int active_color, 
+    CastlingRights castling_rights,
+    int en_passant_target, 
+    int halfmove_clock,
+    int fullmove_clock
+) : 
+    board(pieces),
+    active_color(active_color),
+    white_castle_long(castling_rights.white_castle_long),
+    white_castle_short(castling_rights.white_castle_short), 
+    black_castle_long(castling_rights.black_castle_long),
+    black_castle_short(castling_rights.black_castle_short),
+    en_passant_target(en_passant_target),
+    halfmove_clock(halfmove_clock), 
+    fullmove_clock(fullmove_clock) 
+    { }
+
+std::shared_ptr<Board> Board::from_fen_string(std::string fen) { 
+    std::vector<std::string> fen_split = split(fen, ' ');
+
+    if (fen_split.size() != 6) { 
+        // TODO how do C++ exceptions work exactly? what happens if this is thrown and i dont have a try/catch?
+        throw std::runtime_error("fen string appears to be invalid");
+    }
+
+    std::array<std::shared_ptr<Piece>, 64> pieces = parse_piece_locations(fen_split[0]);
+    
+    int active_color = parse_active_color(fen_split[1]);
+
+    CastlingRights castling_rights = parse_castling_rights(fen_split[2]);
+
+    int en_passant_target = -1; 
+    if (fen_split[3].c_str()[0] != '-') { 
+        en_passant_target = get_board_index(fen_split[3].c_str());
+    }
+
+    int halfmove_clock = std::stoi(fen_split[4]); 
+    int fullmove_clock = std::stoi(fen_split[5]); 
+
+    return std::shared_ptr<Board>(
+        new Board(pieces,
+            active_color,
+            castling_rights,  
+            en_passant_target, 
+            halfmove_clock, 
+            fullmove_clock
+            )
+        );
+    
+}
+
 Piece* Board::piece_at(int index) {
     if (index < 0 || index >= 64) { return nullptr; }
     
@@ -25,23 +70,27 @@ Piece* Board::piece_at(int index) {
 }    
 
 std::shared_ptr<Board> Board::clone() { 
-    auto copied = std::make_shared<Board>();
-
-    copied->white_castle_short = this->white_castle_short;
-    copied->white_castle_long = this->white_castle_long;
-    copied->black_castle_short = this->black_castle_short;
-    copied->black_castle_long = this->black_castle_long;
-    copied->en_passant_target = this->en_passant_target;
-    copied->halfmove_clock = this->halfmove_clock;
-    copied->fullmove_clock = this->fullmove_clock;
-    copied->active_color = this->active_color;
-
+    std::array<std::shared_ptr<Piece>, 64> pieces_copy; 
     for (int i = 0; i < 64; ++i) { 
-        copied->board[i]->data = this->board[i]->data;
-        copied->board[i]->vision.insert(this->board[i]->vision.begin(), this->board[i]->vision.end());
+        pieces_copy[i] = Piece::make_empty();
+        pieces_copy[i]->data = this->board[i]->data;
+        pieces_copy[i]->vision.insert(this->board[i]->vision.begin(), this->board[i]->vision.end());
     }
 
-    return copied;
+    return std::shared_ptr<Board>(new Board(
+        pieces_copy,
+        active_color,
+        CastlingRights(
+            white_castle_long,
+            white_castle_short,
+            black_castle_long,
+            black_castle_short
+        ),  
+        en_passant_target, 
+        halfmove_clock, 
+        fullmove_clock
+    )); 
+
 }
 
 // take a peek at what pieces will be able to see if a move is executed
@@ -50,6 +99,7 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
     
     auto next = this->clone();
 
+    // TODO use move() function
     std::shared_ptr<Piece> move_target = next->board[start];
     std::shared_ptr<Piece> destination_target = next->board[target];
 
@@ -121,46 +171,6 @@ MoveType Board::move_piece(int start, int target) {
 
     return MoveType::NO_MOVE;
 }
-
-// MoveType Board::move_piece(int start, int target) { 
-//     // std::cout << "moving piece " << start << " to " << target << std::endl;
-//     if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
-    
-//     // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
-//     std::shared_ptr<Piece> move_target = this->board[start];
-//     std::shared_ptr<Piece> destination_target = this->board[target];
-
-//     if (move_target->color() != this->active_color) return MoveType::NO_MOVE;
-
-//     if (!move_target->vision.contains(target)) return MoveType::NO_MOVE; // invalid move
-
-//     if (destination_target->data == PieceType::EMPTY) { 
-//         std::shared_ptr<Piece> temp = destination_target;
-//         this->board[target] = move_target;
-//         this->board[start] = temp;
-
-//         this->en_passant_target = -1;
-//         check_en_pessant(start, target);
-//         check_castling(target);
-//         increment_clock();
-//         generate_legal_moves();
-//         return MoveType::MOVE;
-//     }
-
-//     if (destination_target->color() != move_target->color()) { 
-//         this->board[target] = move_target; 
-//         this->board[start] = Piece::make_empty();
-
-//         this->en_passant_target = -1;
-//         check_en_pessant(start, target);
-//         check_castling(target);
-//         increment_clock();
-//         generate_legal_moves();
-//         return MoveType::CAPTURE; 
-//     }
-
-//     return MoveType::NO_MOVE;
-// }
 
 void Board::prune_illegal_moves() { 
     for (int i = 0; i < 64; ++i) { 
@@ -265,12 +275,6 @@ void Board::pawn_moves(Piece* piece, int index) {
     
     Piece* left_target = piece_at(left);
     Piece* right_target = piece_at(right);
-    
-    if (left_target == nullptr) { 
-        std::cout << "index: " << index << std::endl;
-        std::cout << "piece: " << piece->name() << std::endl;
-        std::cout << "target index: " << left << std::endl; 
-    }
 
     // These if statements are why we need comments.
     if (left_target != nullptr) { 
@@ -470,14 +474,16 @@ void Board::king_vision(Piece* piece, int index) {
 
     if (!on_left_edge) { 
         int w_target = index + Direction::WEST; 
-        if (this->board[w_target]->data == PieceType::EMPTY || this->board[w_target]->color() != piece->color()) { 
+        if (this->board[w_target]->data == PieceType::EMPTY 
+            || this->board[w_target]->color() != piece->color()) { 
             piece->vision.insert(w_target);
         }
     } 
 
     if (!on_right_edge) { 
         int e_target = index + Direction::EAST; 
-        if (this->board[e_target]->data == PieceType::EMPTY || this->board[e_target]->color() != piece->color()) { 
+        if (this->board[e_target]->data == PieceType::EMPTY 
+            || this->board[e_target]->color() != piece->color()) { 
             piece->vision.insert(e_target);
         }
     }
@@ -560,363 +566,27 @@ void Board::king_vision(Piece* piece, int index) {
 
 }
 
-void print_board(const Board& board) { 
-    int counter = 0;
-    std::string result = ""; 
+// void parse_fen_string(std::string fen, Board& board) { 
+//     std::vector<std::string> fen_split = split(fen, ' ');
 
-    for (int i = 0; i < 64; ++i) { 
-        switch (board.board[i]->data) { 
-            case PieceType::BLACK | PieceType::PAWN: 
-                result.append("p");
-                break; 
-            case PieceType::WHITE | PieceType::PAWN: 
-                result.append("P");
-                break;
-            case PieceType::BLACK | PieceType::KNIGHT: 
-                result.append("n");
-                break;
-            case PieceType::WHITE | PieceType::KNIGHT: 
-                result.append("N");
-                break; 
-            case PieceType::BLACK | PieceType::BISHOP: 
-                result.append("b");
-                break;
-            case PieceType::WHITE | PieceType::BISHOP: 
-                result.append("B");
-                break;
-            case PieceType::BLACK | PieceType::ROOK: 
-                result.append("r");
-                break;
-            case PieceType::WHITE | PieceType::ROOK: 
-                result.append("R");
-                break;
-            case PieceType::BLACK | PieceType::QUEEN:
-                result.append("q");
-                break;
-            case PieceType::WHITE | PieceType::QUEEN: 
-                result.append("Q");
-                break;
-            case PieceType::BLACK | PieceType::KING:
-                result.append("k");
-                break;
-            case PieceType::WHITE | PieceType::KING:
-                result.append("K");
-                break;
-            case PieceType::EMPTY: 
-                result.append("0");
-                break;
-        }
+//     if (fen_split.size() != 6) { 
+//         // TODO how do C++ exceptions work exactly? what happens if this is thrown and i dont have a try/catch?
+//         throw std::runtime_error("fen string appears to be invalid");
+//     }
 
-        result.append(" ");
-        counter++; 
-        if (counter == 8) { 
-            result.append("\n"); 
-            counter = 0;
-        }
-    }
-
-    std::cout << result << std::endl;
-}
-
-std::vector<std::string> split(std::string s, const char delim) { 
-    std::vector<std::string> result; 
-    std::size_t pos;
-    std::string token; 
-
-    while ((pos = s.find(delim)) != std::string::npos) { 
-        token = s.substr(0, pos); 
-        result.push_back(token);
-        s.erase(0, pos + 1); 
-    }
-
-    result.push_back(s);
-
-    return result; 
-}
-
-void parse_piece_locations(const std::string& fen, Board& board) { 
-    auto it = fen.begin(); 
-    int index = 0;
-
-    while (it != fen.end()) { 
-        Piece* current_piece = board.board[index].get(); 
-        if (isdigit(*it)) { 
-            index += (*it - '0'); 
-        } else { 
-            switch (*it) { 
-                case 'p':
-                    current_piece->data = PieceType::BLACK | PieceType::PAWN; 
-                    index++;
-                    break; 
-                case 'P': 
-                    current_piece->data = PieceType::WHITE | PieceType::PAWN;
-                    index++;
-                    break;
-                case 'n': 
-                    current_piece->data = PieceType::BLACK | PieceType::KNIGHT;
-                    index++;
-                    break;
-                case 'N': 
-                    current_piece->data = PieceType::WHITE | PieceType::KNIGHT; 
-                    index++;
-                    break; 
-                case 'b': 
-                    current_piece->data = PieceType::BLACK | PieceType::BISHOP;
-                    index++;
-                    break;
-                case 'B': 
-                    current_piece->data = PieceType::WHITE | PieceType::BISHOP;
-                    index++;
-                    break;
-                case 'r': 
-                    current_piece->data = PieceType::BLACK | PieceType::ROOK;
-                    index++;
-                    break;
-                case 'R': 
-                    current_piece->data = PieceType::WHITE | PieceType::ROOK;
-                    index++;
-                    break;
-                case 'q':
-                    current_piece->data = PieceType::BLACK | PieceType::QUEEN;
-                    index++;
-                    break;
-                case 'Q': 
-                    current_piece->data = PieceType::WHITE | PieceType::QUEEN;
-                    index++;
-                    break;
-                case 'k':
-                    current_piece->data = PieceType::BLACK | PieceType::KING;
-                    index++;
-                    break;
-                case 'K':
-                    current_piece->data = PieceType::WHITE | PieceType::KING;
-                    index++;
-                    break;
-                case '/': 
-                    // skip, should go to next rank
-                    break;
-            }
-        }
-        it++;
-    }
-}
+//     parse_piece_locations(fen_split[0], board);
     
-void parse_active_color(const std::string& fen, Board& board) { 
-    char active_color = fen.c_str()[0];
-    if (active_color == 'w') {
-        board.active_color = PieceType::WHITE;
-        return;
-    } 
+//     parse_active_color(fen_split[1], board);
 
-    if (active_color == 'b') { 
-        board.active_color = PieceType::BLACK;
-        return;
-    }
-}
+//     parse_castling_rights(fen_split[2], board);
 
-void parse_castling_rights(const std::string& fen, Board& board) { 
-    auto it = fen.begin();
+//     parse_en_passant_targets(fen_split[3], board);
 
-    while (it != fen.end()) { 
-        switch (*it) { 
-            case 'Q': 
-                board.white_castle_long = true;
-                break;
-            case 'q': 
-                board.black_castle_long = true; 
-                break;
-            case 'K': 
-                board.white_castle_short = true; 
-                break;
-            case 'k': 
-                board.black_castle_short = true; 
-                break;
-            case '-': 
-                // no one has castling rights, which is the default in my board
-                break;
-        }
+//     parse_halfmove_clock(fen_split[4], board);
 
-        it++;
-    }
-}
+//     parse_fullmove_clock(fen_split[5], board);
 
-void parse_en_passant_targets(const std::string& fen, Board& board) { 
-    // Parse en-passant targets 
-    const char* target = fen.c_str(); 
-
-    if (target[0] == '-') { 
-        board.en_passant_target = -1;
-    } else { 
-        board.en_passant_target = get_board_index(target);
-    }
-}
-
-void parse_halfmove_clock(const std::string& fen, Board& board) { 
-    board.halfmove_clock = std::stoi(fen);
-}
-
-void parse_fullmove_clock(const std::string& fen, Board& board) { 
-    board.fullmove_clock = std::stoi(fen);
-}
-
-void parse_fen_string(std::string fen, Board& board) { 
-    std::vector<std::string> fen_split = split(fen, ' ');
-
-    if (fen_split.size() != 6) { 
-        // TODO how do C++ exceptions work exactly? what happens if this is thrown and i dont have a try/catch?
-        throw std::runtime_error("fen string appears to be invalid");
-    }
-
-    parse_piece_locations(fen_split[0], board);
-    
-    parse_active_color(fen_split[1], board);
-
-    parse_castling_rights(fen_split[2], board);
-
-    parse_en_passant_targets(fen_split[3], board);
-
-    parse_halfmove_clock(fen_split[4], board);
-
-    parse_fullmove_clock(fen_split[5], board);
-
-}
-
-std::string generate_fen_string(const Board& board) { 
-    std::string fen; 
-    // The counter for where to place '/' in the fen string. when this is 8, we need a new line 
-    int rank_count = 0;
-    
-    // The counter for when we encounter empty spaces. Every empty space adds 1 to the counter, when a non-empty square is reached
-    // I need to append this count to the fen string only if it is greater than 0. If we do append it, it should be reset back to 0
-    int skip_count = 0;
-
-    for (int i = 0; i < 64; i++) { 
-        if (board.board[0]->data == PieceType::EMPTY) { 
-            skip_count++;
-            continue;
-        }
-
-        if (skip_count != 0) { 
-            // fen.append();
-            skip_count = 0;
-        }
-        
-        switch (board.board[i]->data) { 
-            case PieceType::BLACK | PieceType::PAWN: 
-                break;
-                
-        }
-
-        // switch (board.board[i]) { 
-        //     case Piece::BLACK | Piece::PAWN: 
-              
-        // }
-    }
-
-    return fen;
-}
-
-// accepts a position string in algebraic notation, ex: e4, g6, h5
-int get_board_index(const char* square) { 
-    int rank_offset = 0;
-    int file_offset = 0; 
-
-    switch (square[0]) { 
-        case 'a': 
-            file_offset = 0;
-            break;
-        case 'b': 
-            file_offset = 1; 
-            break;
-        case 'c':
-            file_offset = 2;
-            break;
-        case 'd':
-            file_offset = 3;
-            break;
-        case 'e': 
-            file_offset = 4;
-            break;
-        case 'f': 
-            file_offset = 5;
-            break;
-        case 'g': 
-            file_offset = 6;
-            break;
-        case 'h': 
-            file_offset = 7;
-            break;
-    }
-    
-    switch(square[1]) { 
-        case '1': 
-            rank_offset = 7;
-            break;
-        case '2':
-            rank_offset = 6;
-            break;
-        case '3': 
-            rank_offset = 5;
-            break;
-        case '4': 
-            rank_offset = 4;
-            break;
-        case '5': 
-            rank_offset = 3;
-            break;
-        case '6': 
-            rank_offset = 2;
-            break;
-        case '7': 
-            rank_offset = 1;
-            break;
-        case '8': 
-            rank_offset = 0;
-            break;
-    }
-
-    return (rank_offset * 8) + file_offset;
-}
-
-void print_index() {
-  int counter = 0; 
-  for (int i = 0; i < 64; ++i) {
-    if (counter == 8) {
-      std::cout << std::endl;
-      counter = 0;
-    }
-    std::cout << i << " ";
-    counter++;
-  }
-  std::cout << std::endl;
-}
-
-bool is_edge_index(int i) { 
-    return left_edges.contains(i) || right_edges.contains(i) || top_edges.contains(i) || bottom_edges.contains(i);
-}
-
-bool is_edge_in_direction(int i, int direction) { 
-    switch (direction) { 
-        case Direction::NORTH: 
-            return top_edges.contains(i);
-        case Direction::SOUTH: 
-            return bottom_edges.contains(i);
-        case Direction::EAST: 
-            return right_edges.contains(i);
-        case Direction::WEST: 
-            return left_edges.contains(i);
-        case Direction::NORTH_EAST: 
-            return top_edges.contains(i) || right_edges.contains(i);
-        case Direction::NORTH_WEST: 
-            return top_edges.contains(i) || left_edges.contains(i);
-        case Direction::SOUTH_EAST: 
-            return bottom_edges.contains(i) || right_edges.contains(i);
-        case Direction::SOUTH_WEST: 
-            return bottom_edges.contains(i) || left_edges.contains(i);
-        default:
-            return is_edge_index(i);
-    }
-}
+// }
 
 void Board::increment_clock() { 
     this->halfmove_clock++; 
