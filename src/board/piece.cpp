@@ -83,9 +83,7 @@ std::string Piece::name() {
 }
 
 void move(Piece* moving, Piece* destination) { 
-    if (moving == nullptr || destination == nullptr) { 
-        std::cout << "moving address: " << moving << std::endl;
-        std::cout << "destination address: " << destination << std::endl;
+    if (moving == nullptr || destination == nullptr) {
         throw std::runtime_error("cannot move piece to or from a nullptr"); 
     }
 
@@ -93,6 +91,5 @@ void move(Piece* moving, Piece* destination) {
     moving->data = PieceType::EMPTY; 
 
     destination->vision.clear();
-    destination->vision.insert(moving->vision.begin(), moving->vision.end());
     moving->vision.clear();
 }

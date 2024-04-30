@@ -45,5 +45,6 @@ std::vector<std::string> split(std::string, const char);
 // literal edge case detection 
 bool is_edge_index(int);
 bool is_edge_in_direction(int, int);
+bool index_inbounds(int);
 
 

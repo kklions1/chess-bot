@@ -303,3 +303,5 @@ bool is_edge_in_direction(int i, int direction) {
             return is_edge_index(i);
     }
 }
+
+bool index_inbounds(int index) { return index >= 0 && index <= 63; }

@@ -38,3 +38,9 @@ typedef enum MoveType {
     MOVE,
     CAPTURE 
 } MoveType; 
+
+typedef enum GameEndState { 
+    PLAYING, 
+    STALEMATE,
+    CHECKMATE
+} GameEndState;

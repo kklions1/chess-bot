@@ -225,6 +225,19 @@ void gui_main(std::shared_ptr<Board> board) {
             main_window.draw(move);
         }
 
+        if (board->game_end_state != GameEndState::PLAYING) { 
+            sf::Font font; 
+            font.loadFromFile("arial.ttf");
+
+            sf::Text game_over_text; 
+            game_over_text.setFont(font); 
+            game_over_text.setString("Game Over!");
+            game_over_text.setFillColor(sf::Color::Red);
+            game_over_text.setPosition(sf::Vector2f(400.0, 400.0));
+
+            main_window.draw(game_over_text);
+        }
+
         main_window.display();
     }
 }

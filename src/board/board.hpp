@@ -30,6 +30,8 @@ public:
 
     int active_color;
 
+    GameEndState game_end_state; 
+
     MoveType move_piece(int, int);
     void cast_ray(Piece*, int, int);
     void add_attack(Piece*, int);
@@ -62,6 +64,7 @@ private:
     void increment_clock();
     int find_king_index_by_color(int);
     void prune_illegal_moves();
+    void check_game_end_state();
     void calc_piece_vision(); 
     void check_en_pessant(int, int);
     void check_castling(int);  

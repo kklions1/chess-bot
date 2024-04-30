@@ -4,6 +4,7 @@ Board::Board() :
     white_castle_short(false), white_castle_long(false),
     black_castle_short(false), black_castle_long(false), 
     en_passant_target(-1), halfmove_clock(0), fullmove_clock(0),
+    game_end_state(GameEndState::PLAYING),
     active_color(-1) {
         for (int i = 0; i < 64; ++i) { 
             board[i] = Piece::make_empty();
@@ -26,7 +27,8 @@ Board::Board(
     black_castle_short(castling_rights.black_castle_short),
     en_passant_target(en_passant_target),
     halfmove_clock(halfmove_clock), 
-    fullmove_clock(fullmove_clock) 
+    fullmove_clock(fullmove_clock),
+    game_end_state(GameEndState::PLAYING)
     { }
 
 std::shared_ptr<Board> Board::from_fen_string(std::string fen) { 
@@ -243,6 +245,7 @@ void Board::calc_piece_vision() {
 void Board::generate_legal_moves() { 
     calc_piece_vision();
     prune_illegal_moves();
+    check_game_end_state(); 
 }
 
 void Board::pawn_moves(Piece* piece, int index) { 
@@ -566,28 +569,6 @@ void Board::king_vision(Piece* piece, int index) {
 
 }
 
-// void parse_fen_string(std::string fen, Board& board) { 
-//     std::vector<std::string> fen_split = split(fen, ' ');
-
-//     if (fen_split.size() != 6) { 
-//         // TODO how do C++ exceptions work exactly? what happens if this is thrown and i dont have a try/catch?
-//         throw std::runtime_error("fen string appears to be invalid");
-//     }
-
-//     parse_piece_locations(fen_split[0], board);
-    
-//     parse_active_color(fen_split[1], board);
-
-//     parse_castling_rights(fen_split[2], board);
-
-//     parse_en_passant_targets(fen_split[3], board);
-
-//     parse_halfmove_clock(fen_split[4], board);
-
-//     parse_fullmove_clock(fen_split[5], board);
-
-// }
-
 void Board::increment_clock() { 
     this->halfmove_clock++; 
     if (this->active_color == PieceType::WHITE) { 
@@ -714,4 +695,28 @@ void Board::check_castling(int moved_piece_index) {
 
     }
 
+}
+
+void Board::check_game_end_state() { 
+    bool has_legal_moves = false; 
+    for (int i = 0; i < 64; ++i) { 
+        Piece* current = piece_at(i); 
+        if (current->color() != active_color) { continue; } 
+        if (!current->vision.empty()) { 
+            has_legal_moves = true; 
+            break;
+        }
+    }
+
+    if (has_legal_moves) { 
+        this->game_end_state = GameEndState::PLAYING;
+        return;
+    }
+
+    // If there are no legal moves....
+    if (active_player_in_check()) { 
+        this->game_end_state = GameEndState::CHECKMATE; 
+    } else { 
+        this->game_end_state = GameEndState::STALEMATE; 
+    }
 }
