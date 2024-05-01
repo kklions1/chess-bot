@@ -227,14 +227,33 @@ void gui_main(std::shared_ptr<Board> board) {
 
         if (board->game_end_state != GameEndState::PLAYING) { 
             sf::Font font; 
-            font.loadFromFile("arial.ttf");
+            font.loadFromFile("../assets/Roboto-Regular.ttf");
+
+            sf::RectangleShape popup_window(sf::Vector2f(200.0, 50.0)); 
+            popup_window.setPosition(sf::Vector2f(350.0, 350.0)); 
+            popup_window.setFillColor(sf::Color::White);
+            popup_window.setOutlineColor(sf::Color::Black);
+            popup_window.setOutlineThickness(2.0);
 
             sf::Text game_over_text; 
             game_over_text.setFont(font); 
-            game_over_text.setString("Game Over!");
-            game_over_text.setFillColor(sf::Color::Red);
-            game_over_text.setPosition(sf::Vector2f(400.0, 400.0));
+            
+            if (board->game_end_state == GameEndState::CHECKMATE) { 
+                if (board->active_color == PieceType::WHITE) { 
+                    game_over_text.setString("Black Wins!");
+                } else { 
+                    game_over_text.setString("White Wins!");
+                }
+            }
 
+            if (board->game_end_state == GameEndState::STALEMATE) { 
+                game_over_text.setString("Stalemate :(");
+            }
+
+            game_over_text.setFillColor(sf::Color::Red);
+            game_over_text.setPosition(sf::Vector2f(350.0, 350.0));
+
+            main_window.draw(popup_window);
             main_window.draw(game_over_text);
         }
 
