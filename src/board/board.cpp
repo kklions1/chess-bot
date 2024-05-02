@@ -269,12 +269,15 @@ void Board::pawn_moves(Piece* piece, int index) {
         on_starting_rank = black_starting_rank.contains(index);
     }
 
-    if (this->board[advance]->data == PieceType::EMPTY) {
-        piece->vision.insert(advance); 
+    if (index_inbounds(advance)) { 
+        if (this->board[advance]->data == PieceType::EMPTY) {
+            piece->vision.insert(advance); 
     
-        if (on_starting_rank && this->board[advance_twice]->data == PieceType::EMPTY)
-            piece->vision.insert(advance_twice);
-    } 
+            if (on_starting_rank && this->board[advance_twice]->data == PieceType::EMPTY)
+                piece->vision.insert(advance_twice);
+        }
+    }
+     
     
     Piece* left_target = piece_at(left);
     Piece* right_target = piece_at(right);
@@ -720,3 +723,4 @@ void Board::check_game_end_state() {
         this->game_end_state = GameEndState::STALEMATE; 
     }
 }
+
