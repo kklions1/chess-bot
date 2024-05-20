@@ -26,6 +26,10 @@ int Piece::type() {
     return piece_mask & this->data;
 }
 
+bool Piece::is_empty() { 
+    return data == PieceType::EMPTY; 
+}
+
 std::shared_ptr<Piece> Piece::make_empty() { 
     return std::make_shared<Piece>();
 }
@@ -39,7 +43,7 @@ std::string colorName(int color) {
 }
 
 std::string Piece::name() { 
-    if (this->data == PieceType::EMPTY) { return "Empty"; }
+    if (is_empty()) { return "Empty"; }
 
     std::string name = ""; 
 

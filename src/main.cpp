@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     game_board->generate_legal_moves();    
     // print_index();
    
-    // std::thread engine_thread(engine_main, game_board);
+    std::thread engine_thread(engine_main, game_board);
 
     gui_main(game_board);
 

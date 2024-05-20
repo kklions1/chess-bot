@@ -15,6 +15,13 @@
 
 struct CastlingRights;
 
+typedef struct Move { 
+    int start; 
+    int target; 
+
+    Move(int start, int target) : start(start), target(target) {} 
+} Move; 
+
 class Board {
 public:
     std::array<std::shared_ptr<Piece>, 64> board;
@@ -53,6 +60,8 @@ public:
     void queen_moves(Piece*, int);
     void king_vision(Piece*, int);
 
+    void promote_pawn(int, int);
+
     Piece* piece_at(int); 
 
     static std::shared_ptr<Board> from_fen_string(std::string);
@@ -67,7 +76,8 @@ private:
     void check_game_end_state();
     void calc_piece_vision(); 
     void check_en_pessant(int, int);
-    void check_castling(int);  
+    void check_castling(int, int);  
+    int check_promotion(int); 
     
     std::shared_ptr<Board> peek_next_position(int, int); 
 }; 

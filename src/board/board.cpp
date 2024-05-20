@@ -109,14 +109,14 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
 
     if (!move_target->vision.contains(target)) return nullptr; // invalid move
 
-    if (destination_target->data == PieceType::EMPTY) { 
+    if (destination_target->is_empty()) { 
         std::shared_ptr<Piece> temp = destination_target;
         next->board[target] = move_target;
         next->board[start] = temp;
 
         next->en_passant_target = -1; 
         next->check_en_pessant(start, target);
-        next->check_castling(target);
+        next->check_castling(target, start);
         next->increment_clock();
         next->calc_piece_vision();
         return next;
@@ -128,7 +128,7 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
 
         next->en_passant_target = -1; 
         next->check_en_pessant(start, target);
-        next->check_castling(target);
+        next->check_castling(target, start);
         next->increment_clock();
         next->calc_piece_vision();
         return next; 
@@ -138,11 +138,10 @@ std::shared_ptr<Board> Board::peek_next_position(int start, int target) {
 }
 
 MoveType Board::move_piece(int start, int target) { 
-   
      // std::cout << "moving piece " << start << " to " << target << std::endl;
     if (start == target) return MoveType::NO_MOVE; // The piece didnt move.
     
-    // TODO pretty sure that whatever pointer manipulation i do here is a sin, but it works. Maybe fix?
+    // the way i implemented this with move(Piece*, Piece*) feels a lot less terrible and unsafe
     Piece* move_piece = piece_at(start);
     Piece* target_piece = piece_at(target);
 
@@ -150,11 +149,11 @@ MoveType Board::move_piece(int start, int target) {
 
     if (!move_piece->vision.contains(target)) return MoveType::NO_MOVE; // invalid move
 
-    if (target_piece->data == PieceType::EMPTY) { 
+    if (target_piece->is_empty()) { 
         move(move_piece, target_piece);
         this->en_passant_target = -1;
         check_en_pessant(start, target);
-        check_castling(target);
+        check_castling(target, start);
         increment_clock();
         generate_legal_moves();
         return MoveType::MOVE;
@@ -165,7 +164,7 @@ MoveType Board::move_piece(int start, int target) {
 
         this->en_passant_target = -1;
         check_en_pessant(start, target);
-        check_castling(target);
+        check_castling(target, start);
         increment_clock();
         generate_legal_moves();
         return MoveType::CAPTURE; 
@@ -178,7 +177,7 @@ void Board::prune_illegal_moves() {
     for (int i = 0; i < 64; ++i) { 
         Piece* current = this->board[i].get();
 
-        if (current->data == PieceType::EMPTY) { continue; }
+        if (current->is_empty()) { continue; }
 
         std::set<int> invalid_moves; 
 
@@ -270,15 +269,14 @@ void Board::pawn_moves(Piece* piece, int index) {
     }
 
     if (index_inbounds(advance)) { 
-        if (this->board[advance]->data == PieceType::EMPTY) {
+        if (this->board[advance]->is_empty()) {
             piece->vision.insert(advance); 
     
-            if (on_starting_rank && this->board[advance_twice]->data == PieceType::EMPTY)
+            if (on_starting_rank && this->board[advance_twice]->is_empty())
                 piece->vision.insert(advance_twice);
         }
     }
      
-    
     Piece* left_target = piece_at(left);
     Piece* right_target = piece_at(right);
 
@@ -288,7 +286,7 @@ void Board::pawn_moves(Piece* piece, int index) {
             left_target != nullptr &&
             ((left_target->data != PieceType::EMPTY
             && left_target->color() != piece->color()) 
-            || (left_target->data == PieceType::EMPTY
+            || (left_target->is_empty()
                 && left == this->en_passant_target))
             && !left_edges.contains(advance)
         ) piece->vision.insert(left);
@@ -299,7 +297,7 @@ void Board::pawn_moves(Piece* piece, int index) {
             right_target != nullptr &&
             ((right_target->data != PieceType::EMPTY
             && right_target->color() != piece->color()) 
-            || (right_target->data == PieceType::EMPTY
+            || (right_target->is_empty()
                 && right == this->en_passant_target))
             && !right_edges.contains(advance)
         ) piece->vision.insert(right);    
@@ -312,7 +310,7 @@ void Board::cast_ray(Piece* piece, int start, int direction) {
     while (true) { 
         Piece* target = this->board[current].get();
         
-        if (target->data == PieceType::EMPTY) { // Empty square
+        if (target->is_empty()) { // Empty square
             piece->vision.insert(current);
             if (is_edge_in_direction(current, direction)) break; 
             current += direction;
@@ -480,7 +478,7 @@ void Board::king_vision(Piece* piece, int index) {
 
     if (!on_left_edge) { 
         int w_target = index + Direction::WEST; 
-        if (this->board[w_target]->data == PieceType::EMPTY 
+        if (this->board[w_target]->is_empty() 
             || this->board[w_target]->color() != piece->color()) { 
             piece->vision.insert(w_target);
         }
@@ -488,7 +486,7 @@ void Board::king_vision(Piece* piece, int index) {
 
     if (!on_right_edge) { 
         int e_target = index + Direction::EAST; 
-        if (this->board[e_target]->data == PieceType::EMPTY 
+        if (this->board[e_target]->is_empty()
             || this->board[e_target]->color() != piece->color()) { 
             piece->vision.insert(e_target);
         }
@@ -496,42 +494,42 @@ void Board::king_vision(Piece* piece, int index) {
 
     if (!on_bottom_edge) { 
         int s_target = index + Direction::SOUTH; 
-        if (this->board[s_target]->data == PieceType::EMPTY || this->board[s_target]->color() != piece->color()) { 
+        if (this->board[s_target]->is_empty() || this->board[s_target]->color() != piece->color()) { 
             piece->vision.insert(s_target);
         }
     }
 
     if (!on_top_edge) { 
         int n_target = index + Direction::NORTH; 
-        if (this->board[n_target]->data == PieceType::EMPTY || this->board[n_target]->color() != piece->color()) { 
+        if (this->board[n_target]->is_empty() || this->board[n_target]->color() != piece->color()) { 
             piece->vision.insert(n_target);
         }
     }
     
     if (!on_left_edge && !on_top_edge) { 
         int nw_target = index + Direction::NORTH_WEST; 
-        if (this->board[nw_target]->data == PieceType::EMPTY || this->board[nw_target]->color() != piece->color()) { 
+        if (this->board[nw_target]->is_empty() || this->board[nw_target]->color() != piece->color()) { 
             piece->vision.insert(nw_target);
         }
     }
 
     if (!on_left_edge && !on_bottom_edge) { 
         int sw_target = index + Direction::SOUTH_WEST; 
-        if (this->board[sw_target]->data == PieceType::EMPTY || this->board[sw_target]->color() != piece->color()) { 
+        if (this->board[sw_target]->is_empty() || this->board[sw_target]->color() != piece->color()) { 
             piece->vision.insert(sw_target);
         }
     }
 
     if (!on_right_edge && !on_top_edge) { 
         int ne_target = index + Direction::NORTH_EAST; 
-        if (this->board[ne_target]->data == PieceType::EMPTY || this->board[ne_target]->color() != piece->color()) { 
+        if (this->board[ne_target]->is_empty() || this->board[ne_target]->color() != piece->color()) { 
             piece->vision.insert(ne_target);
         }
     }
 
     if (!on_right_edge && !on_bottom_edge) { 
         int se_target = index + Direction::SOUTH_EAST; 
-        if (this->board[se_target]->data == PieceType::EMPTY || this->board[se_target]->color() != piece->color()) { 
+        if (this->board[se_target]->is_empty() || this->board[se_target]->color() != piece->color()) { 
             piece->vision.insert(se_target);
         }
     }
@@ -542,12 +540,12 @@ void Board::king_vision(Piece* piece, int index) {
         case PieceType::WHITE: { 
             if (this->white_castle_long) {
                 int castle_target = index + (2 * Direction::WEST); 
-                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
+                if (this->board[castle_target]->is_empty()) { piece->vision.insert(castle_target); } 
             }
             
             if (this->white_castle_short) { 
                 int castle_target = index + (2 * Direction::EAST); 
-                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
+                if (this->board[castle_target]->is_empty()) { piece->vision.insert(castle_target); } 
             }
 
             break;
@@ -555,12 +553,12 @@ void Board::king_vision(Piece* piece, int index) {
         case PieceType::BLACK: { 
             if (this->black_castle_long) { 
                 int castle_target = index + (2 * Direction::WEST); 
-                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
+                if (this->board[castle_target]->is_empty()) { piece->vision.insert(castle_target); } 
             }   
             
             if (this->black_castle_short) { 
                 int castle_target = index + (2 * Direction::EAST); 
-                if (this->board[castle_target]->data == PieceType::EMPTY) { piece->vision.insert(castle_target); } 
+                if (this->board[castle_target]->is_empty()) { piece->vision.insert(castle_target); } 
             }
 
             break;
@@ -615,7 +613,7 @@ bool Board::active_player_in_check() {
     for (int i = 0; i < 64; ++i) { 
         Piece* current = this->board[i].get(); 
 
-        if (current->data == PieceType::EMPTY) { continue; }
+        if (current->is_empty()) { continue; }
 
         if (current->color() == active_color) { 
             continue;
@@ -645,7 +643,7 @@ bool Board::nap_in_check() {
     for (int i = 0; i < 64; ++i) { 
         Piece* current = this->board[i].get(); 
 
-        if (current->data == PieceType::EMPTY) { continue; }
+        if (current->is_empty()) { continue; }
 
         if (current->color() == inactive_color) { continue; }  
 
@@ -672,7 +670,7 @@ void Board::check_en_pessant(int start, int target) {
     }
 }
 
-void Board::check_castling(int moved_piece_index) { 
+void Board::check_castling(int moved_piece_index, int start_index) { 
     Piece* moved = this->board[moved_piece_index].get();
     int moved_type = moved->type(); 
     
@@ -693,11 +691,20 @@ void Board::check_castling(int moved_piece_index) {
 
     // If we get here, the piece must be a rook. no sense in checking it again.
     if (moved->color() == PieceType::WHITE) { 
-        
+        if (start_index == 56) { 
+            white_castle_long = false; 
+        } 
+        if (start_index == 63) { 
+            white_castle_short = false; 
+        }
     } else { 
-
+        if (start_index == 0) { 
+            black_castle_long = false;
+        }
+        if (start_index == 7) { 
+            black_castle_short = false;
+        }
     }
-
 }
 
 void Board::check_game_end_state() { 
@@ -724,3 +731,21 @@ void Board::check_game_end_state() {
     }
 }
 
+// Returns the index of the pawn that can promote, and -1 if no pawns can promote
+int Board::check_promotion(int target) { 
+    if (this->board[target]->type() == PieceType::PAWN 
+        && (top_edges.contains(target) || bottom_edges.contains(target))) { 
+            return target;
+    }
+
+    return -1; 
+}
+
+void Board::promote_pawn(int index, int promote_selection) { 
+    Piece* promoteTarget = piece_at(index); 
+    if (promoteTarget->is_empty()) { 
+        return;
+    }
+    int pieceColor = promoteTarget->color();
+    promoteTarget->data = promote_selection | pieceColor; 
+}   

@@ -13,6 +13,7 @@ typedef struct Piece {
 
     int color();
     int type();
+    bool is_empty(); 
 
     std::string name(); 
     std::shared_ptr<Piece> clone();
