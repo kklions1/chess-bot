@@ -20,6 +20,8 @@ typedef struct PieceSprite {
 
     void setPosition(const sf::Vector2f&);
     void hide(); 
+
+    static std::unique_ptr<PieceSprite> init(); 
 } PieceSprite; 
 
 typedef std::shared_ptr<PieceSprite> PieceSprite_ptr; 

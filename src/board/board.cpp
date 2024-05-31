@@ -746,6 +746,7 @@ void Board::promote_pawn(int index, int promote_selection) {
     if (promoteTarget->is_empty()) { 
         return;
     }
+
     int pieceColor = promoteTarget->color();
     promoteTarget->data = promote_selection | pieceColor; 
 }   

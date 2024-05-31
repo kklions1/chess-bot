@@ -21,6 +21,7 @@ add_executable(chess
     src/engine/engine_state.cpp
     src/board/move_result.cpp
     src/board/coordinate.cpp
+    src/gui/promotion.cpp
 )
 
 # i have no idea how CMake finds these
