@@ -14,6 +14,6 @@ public:
 
 private: 
     PromotionWindow(); 
-    PromotionWindow(const TextureMap* textures) : textures(textures) {} 
+    // PromotionWindow(const TextureMap* textures) : textures(textures) {} 
 
 }; 

@@ -91,15 +91,75 @@ TextureMap init_textures() {
     return texture_map;
 }
 
-sf::Vector2f normalize_to_corner(const sf::Vector2f& pos) {
-    return sf::Vector2f((((int) pos.x / 100) * 100), ((int) (pos.y / 100) * 100));
-}
-
 void debug_print_vector(const sf::Vector2f& vec) {
     std::cout << "(" << vec.x << ", " << vec.y << ")\n";
 }
 
-void show_moves_for_piece(PieceSprite* vision_target, std::vector<sf::CircleShape>& legal_move_indicatior, int active_color) { 
+std::vector<std::unique_ptr<PieceSprite>> init_sprites(Board* board, const TextureMap& texture_map) {
+    std::vector<std::unique_ptr<PieceSprite>> result;
+    for (int i = 0; i < 64; ++i) { 
+        auto piece = board->board[i];
+        if (piece->data != PieceType::EMPTY) { 
+            result.push_back(PieceSprite::board_sprite(texture_map.at(piece->data), piece, calculate_position(i)));
+        }
+    }
+
+    return result;
+}
+
+// Calculates the position for a sprite based on its index on the board
+sf::Vector2f calculate_position(int index) { 
+    int file = index / 8;
+    int rank = index % 8; 
+
+    return sf::Vector2f(rank * 100, file * 100);
+}
+
+// Calculates the index in the board for a sprite based on its position 
+int calculate_index(const sf::Vector2i& pos) { 
+    int x = (pos.x / 100); 
+    int y = (pos.y / 100); 
+
+    return (y * 8) + x; 
+}
+
+int calculate_index(const sf::Vector2f& pos) { 
+    // convert position into simple (x, y) coordinates 
+    int x = (pos.x / 100); 
+    int y = (pos.y / 100); 
+
+    return (y * 8) + x; 
+}
+
+PieceSprite* get_piece_at_position(const sf::Vector2i& pos, const std::vector<std::unique_ptr<PieceSprite>>& sprites) {
+    for (int i = 0; i < sprites.size(); ++i) { 
+        if (sprites[i]->shape.getGlobalBounds().contains(sf::Vector2f(pos))) { 
+            return sprites[i].get(); 
+        }
+    }
+
+    return nullptr;
+}
+
+int get_sprite_index_for_board_index(int index, const std::vector<std::unique_ptr<PieceSprite>>& sprites) {
+    sf::Vector2f pos = calculate_position(index);
+
+    for (int i = 0; i < sprites.size(); ++i) { 
+        if (sprites[i]->shape.getPosition() == sf::Vector2f(pos)) { 
+            return i; 
+        }
+    }
+
+    return -1;
+}
+
+void snap_piece_to_square(const sf::Vector2f& mouse_pos, PieceSprite* sprite) { 
+    if (sprite == nullptr) return;
+
+    sprite->setPosition(mouse_pos);
+}
+
+void show_moves_for_piece(const PieceSprite* vision_target, std::vector<sf::CircleShape>& legal_move_indicatior, int active_color) { 
     if (vision_target == nullptr) return;
 
     if (vision_target->piece->color() != active_color) return;
@@ -120,8 +180,8 @@ void gui_main(std::shared_ptr<Board> board) {
     auto squares = init_squares();
     auto pieces = init_sprites(board.get(), texture_map);
     std::vector<sf::CircleShape> legal_move_indicator;
-    PieceSprite_ptr drag_target;
-    PieceSprite_ptr vision_target;
+    PieceSprite* drag_target;
+    PieceSprite* vision_target;
     int move_target_starting_index;
     int move_target_index;
     bool is_dragging = false;
@@ -143,7 +203,7 @@ void gui_main(std::shared_ptr<Board> board) {
                     vision_target = sprite_ptr;
                     
                     legal_move_indicator.clear();
-                    show_moves_for_piece(vision_target.get(), legal_move_indicator, board->active_color);
+                    show_moves_for_piece(vision_target, legal_move_indicator, board->active_color);
                     is_dragging = true;
                     break;
                 }
@@ -167,9 +227,10 @@ void gui_main(std::shared_ptr<Board> board) {
                             break;
                         }
                         case MoveType::CAPTURE: { 
-                            auto capture_target = get_sprite_at_board_index(move_target_index, pieces); 
-
-                            if (capture_target != pieces.end()) pieces.erase(capture_target);
+                            // TODO test to make sure this still works.
+                            if (int sprite_index = get_sprite_index_for_board_index(move_target_index, pieces) != -1) { 
+                                pieces.erase(pieces.begin() + sprite_index);
+                            }
 
                             drag_target->setPosition(mouse_pos);
                             legal_move_indicator.clear();
@@ -213,15 +274,15 @@ void gui_main(std::shared_ptr<Board> board) {
             drag_target->shape.setPosition(mouse_pos);
         }
 
-        for (auto s : squares) {
+        for (auto const s : squares) {
             main_window.draw(s);
         }
 
-        for (auto p : pieces) { 
+        for (auto const& p : pieces) { 
             main_window.draw(p->shape);
         }
 
-        for (auto move : legal_move_indicator) { 
+        for (auto const move : legal_move_indicator) { 
             main_window.draw(move);
         }
 
